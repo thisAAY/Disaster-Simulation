@@ -3,23 +3,32 @@ package model.disasters;
 import simulation.Rescuable;
 import simulation.Simulatable;
 
-public abstract class  Disaster implements Simulatable {
-		private int startCycle;
-		private Rescuable target;
-		private boolean active=false;
+public abstract class Disaster implements Simulatable {
+	private int startCycle;
+	private Rescuable target;
+	private boolean active;
 
-		public Disaster(int startCycle, Rescuable target) {
-			this.startCycle=startCycle;
-			this.target=target;
-		}
-		public abstract int  getStartCycle() ;
-		public abstract Rescuable getTarget();
-		public void setActive(boolean x){
-			active = x;
-			
-		}
-		public boolean getActive(){
-return active;
-		}
+	public Disaster(int startCycle, Rescuable target) {
+		this.startCycle = startCycle;
+		this.target = target;
+		this.active = false;
+	}
+
+	public int getStartCycle() {
+		return startCycle;
+	}
+
+	public Rescuable getTarget() {
+		return target;
+	}
+
+	public void setActive(boolean x) {
+		active = x;
+
+	}
+
+	public boolean getActive() {
+		return active;
+	}
 
 }
