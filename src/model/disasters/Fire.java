@@ -1,5 +1,11 @@
 package model.disasters;
 
-public class Fire {
+import model.infrastructure.ResidentialBuilding;
 
+public class Fire extends Disaster {
+
+	public Fire(int startCycle, ResidentialBuilding target) {
+		super(startCycle, target);
+	}
+	
 }
