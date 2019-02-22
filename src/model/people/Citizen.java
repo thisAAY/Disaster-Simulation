@@ -6,19 +6,25 @@ import simulation.Rescuable;
 import simulation.Simulatable;
 
 public class Citizen  implements Rescuable,Simulatable {
-	Address location;
-	CitizenState state;
-	Disaster disaster;
-	String nationalID;
-	String name;
-	int age;
-	int hp;
-	int bloodLoss;
-	int toxicity;
+	private Address location;
+	private CitizenState state;
+	private Disaster disaster;
+	private String nationalID;
+	private String name;
+	private int age;
+	private int hp;
+	private int bloodLoss;
+	private int toxicity;
 	
 	public Citizen (Address location, String nationalID, String name, int age){
-		this.age=age;this.location=location;this.nationalID=nationalID;this.name=name;
-		this.state=CitizenState.SAFE;toxicity=0;hp=100;bloodLoss=0;
+		this.age=age;
+		this.location=location;
+		this.nationalID=nationalID;
+		this.name=name;
+		this.state=CitizenState.SAFE;
+		hp=100;
+		toxicity=0;
+		bloodLoss=0;
 		}
 	public String getName(){
 		return name;
@@ -34,8 +40,8 @@ public class Citizen  implements Rescuable,Simulatable {
 		return age;
 	}
 	
-	public void setState(CitizenState s){
-		state=s;
+	public void setState(CitizenState state){
+		this.state=state;
 	}
 	public CitizenState getState(){
 		return state;
@@ -49,8 +55,8 @@ public class Citizen  implements Rescuable,Simulatable {
 	public int getHp(){
 		return hp;
 	}
-	public void setHp(int h){
-		hp=h;
+	public void setHp(int hp){
+		this.hp=hp;
 	}
 	public int getToxicity(){
 		return toxicity;
@@ -62,8 +68,8 @@ public class Citizen  implements Rescuable,Simulatable {
 	public int getBloodLoss(){
 		return bloodLoss;
 	}
-	public void setBloodLoss(int b){
-		bloodLoss=b;
+	public void setBloodLoss(int bloodLoss){
+		this.bloodLoss=bloodLoss;
 		
 	}
 	
