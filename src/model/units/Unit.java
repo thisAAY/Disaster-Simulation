@@ -5,20 +5,21 @@ import simulation.Rescuable;
 import simulation.Simulatable;
 
 public abstract class Unit implements Simulatable {
-	String unitID;
-	UnitState state=UnitState.IDLE;
-	Address location;
-	Rescuable target;
-	int distanceToTarget;
-	int stepsPerCycle;
+	private String unitID;
+	private UnitState state=UnitState.IDLE;
+	private Address location;
+	private Rescuable target;
+	private int distanceToTarget;
+	private int stepsPerCycle;
 	public Unit(String id, Address location, int stepsPerCycle){
 		unitID=id;
-		this.location=location;this.stepsPerCycle=stepsPerCycle;
+		this.location=location;
+		this.stepsPerCycle=stepsPerCycle;
 	}
 	public String getUnitID(){
 		return unitID;}
-	public void setState(UnitState s){
-		state=s;
+	public void setState(UnitState state){
+		this.state=state;
 	}
 	public UnitState getState(){
 		return state;
@@ -32,9 +33,7 @@ public abstract class Unit implements Simulatable {
 	public Rescuable getTarget(){
 		return target;
 	}
-/*	public int getDistanceToTarget(){
-		return distanceToTarget;
-	}*/
+
 	public int getStepsPerCycle(){
 		return stepsPerCycle;
 	}
