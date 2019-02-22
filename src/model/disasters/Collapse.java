@@ -1,5 +1,10 @@
 package model.disasters;
 
-public class Collapse extends Disaster {
+import model.infrastructure.ResidentialBuilding;
+import simulation.Rescuable;
+
+public class Collapse  {
+
+
 
 }
