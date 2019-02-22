@@ -6,9 +6,9 @@ import simulation.Address;
 import model.people.Citizen;
 
 public abstract class PoliceUnit extends Unit {
-	ArrayList<Citizen>	passengers;
-	int maxCapacity ;
-	int distanceToBase;
+	private ArrayList<Citizen>	passengers;
+	private int maxCapacity ;
+	private int distanceToBase;
 	public PoliceUnit(String id, Address location, int stepsPerCycle, int maxCapacity){
 		super(id,location,stepsPerCycle);
 		this.maxCapacity=maxCapacity;
@@ -19,8 +19,8 @@ public abstract class PoliceUnit extends Unit {
 	public int getDistanceToBase(){
 		return distanceToBase;
 	}
-	public void setDistanceToBase(int d){
-		distanceToBase=d;
+	public void setDistanceToBase(int distanceToBase){
+		this.distanceToBase=distanceToBase;
 	}
 
 }
