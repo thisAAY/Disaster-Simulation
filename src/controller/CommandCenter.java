@@ -15,7 +15,7 @@ public class CommandCenter {
 	private ArrayList<Unit> emergencyUnits;
 	public CommandCenter() throws IOException
 	{
-		Simulator simulator = new Simulator();
+		engine = new Simulator();
 		visibleBuildings =  new ArrayList<>();
 		visibleCitizens =  new ArrayList<>();
 		emergencyUnits = new ArrayList<>();
