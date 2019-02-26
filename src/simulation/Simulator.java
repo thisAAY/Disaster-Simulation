@@ -1,5 +1,6 @@
 package simulation;
 
+import java.awt.image.RescaleOp;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -30,12 +31,15 @@ public class Simulator {
 
 	public Simulator() throws IOException {
 		makeWorld();
-		loadUnits("res/units.csv");
-		loadBuildings("res/buildings.csv");
-		loadCitizens("res/citizens.csv");
-		loadDisasters("res/disasters.csv");
 		executedDisasters = new ArrayList<>();
-
+		citizens =  new ArrayList<Citizen>();
+		emergencyUnits =  new ArrayList<Unit>();
+		plannedDisasters =new ArrayList<Disaster>();
+		buildings =  new ArrayList<ResidentialBuilding>();
+		loadCitizens("citizens.csv");
+		loadBuildings("buildings.csv");
+		loadUnits("units.csv");
+		loadDisasters("disasters.csv");
 	}
 
 	private void makeWorld() {
@@ -49,7 +53,7 @@ public class Simulator {
 
 	private void loadUnits(String filePath) throws IOException {
 		ArrayList<String> units = readFile(filePath);
-		emergencyUnits = new ArrayList<>();
+
 		for (String unitLine : units) {
 			String[] data = unitLine.split(",");
 			String type = data[0];
@@ -81,18 +85,19 @@ public class Simulator {
 
 	private void loadBuildings(String filePath) throws IOException {
 		ArrayList<String> bs = readFile(filePath);
-		buildings = new ArrayList<>();
 		for (String buildingLine : bs) {
 			String[] data = buildingLine.split(",");
 			int x = Integer.parseInt(data[0]);
 			int y = Integer.parseInt(data[1]);
-			buildings.add(new ResidentialBuilding(world[x][y]));
+			ArrayList<Citizen> citizens = findCitizens(x,y);
+			ResidentialBuilding building =  new ResidentialBuilding(world[x][y]);
+			building.getOccupants().addAll(citizens);
+			buildings.add(building);
 		}
 	}
 
 	private void loadCitizens(String filePath) throws IOException {
 		ArrayList<String> cs = readFile(filePath);
-		citizens = new ArrayList<>();
 		for (String citizenLine : cs) {
 			String[] data = citizenLine.split(",");
 			int x = Integer.parseInt(data[0]);
@@ -108,7 +113,6 @@ public class Simulator {
 
 	private void loadDisasters(String filePath) throws IOException {
 		ArrayList<String> ds = readFile(filePath);
-		plannedDisasters = new ArrayList<>();
 		for (String disasterLine : ds) {
 			String[] data = disasterLine.split(",");
 			int startCycle = Integer.parseInt(data[0]);
@@ -124,6 +128,7 @@ public class Simulator {
 				break;
 			case "FIR":
 				disaster = new Fire(startCycle, findBuilding(data[2], data[3]));
+				break;
 			default: // "GLK"
 				disaster = new GasLeak(startCycle, findBuilding(data[2], data[3]));
 				break;
@@ -152,7 +157,14 @@ public class Simulator {
 		}
 		return null;
 	}
-
+	private ArrayList<Citizen> findCitizens(int x, int y) {
+		ArrayList<Citizen> citizens =  new ArrayList<Citizen>();
+		for (Citizen citizen : this.citizens) {
+			if (citizen.getLocation().getX() == x && citizen.getLocation().getY() == y)
+				citizens.add(citizen);
+		}
+		return citizens;
+	}
 	private ArrayList<String> readFile(String path) throws IOException {
 		FileReader fileReader = new FileReader(path);
 		BufferedReader reader = new BufferedReader(fileReader);

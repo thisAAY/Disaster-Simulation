@@ -19,6 +19,7 @@ public class ResidentialBuilding implements Rescuable, Simulatable {
 
 	public ResidentialBuilding(Address location) {
 		this.location = location;
+		occupants =  new ArrayList<Citizen>();
 	}
 
 	public Address getLocation() {
@@ -49,11 +50,11 @@ public class ResidentialBuilding implements Rescuable, Simulatable {
 		this.fireDamage = fireDamage;
 	}
 
-	public int getGasDamage() {
+	public int getGasLevel() {
 		return gasLevel;
 	}
 
-	public void setGasDamage(int gasDamage) {
+	public void setGasLevel(int gasDamage) {
 		this.gasLevel = gasDamage;
 	}
 

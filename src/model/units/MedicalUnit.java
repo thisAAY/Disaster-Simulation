@@ -11,20 +11,5 @@ public abstract class MedicalUnit extends Unit{
 		treatmentAmount = 10;
 	}
 	
-	public int getHealingAmount()
-	{
-		return healingAmount;
-	}
-	public void setHealingAmount(int healingAmount)
-	{
-		this.healingAmount = healingAmount;
-	}
-	public int getTreatmentAmount()
-	{
-		return treatmentAmount;
-	}
-	public void setTreatmentAmount(int treatmentAmount)
-	{
-		this.treatmentAmount = treatmentAmount;
-	}
+	
 }

@@ -27,7 +27,7 @@ public abstract class Disaster implements Simulatable {
 
 	}
 
-	public boolean getActive() {
+	public boolean isActive() {
 		return active;
 	}
 
