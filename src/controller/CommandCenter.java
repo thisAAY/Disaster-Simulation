@@ -13,11 +13,12 @@ public class CommandCenter {
 	private ArrayList<ResidentialBuilding> visibleBuildings;
 	private ArrayList<Citizen> visibleCitizens;
 	private ArrayList<Unit> emergencyUnits;
-	public CommandCenter() throws IOException
-	{
-		engine = new Simulator();
-		visibleBuildings =  new ArrayList<>();
-		visibleCitizens =  new ArrayList<>();
-		emergencyUnits = new ArrayList<>();
+	public CommandCenter() throws IOException{
+		engine =new Simulator();
+		visibleBuildings=new ArrayList<>();
+		visibleCitizens=new ArrayList<>();
+		emergencyUnits=new ArrayList<>();
 	}
+	
+
 }

@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-
 import model.disasters.Disaster;
 import model.disasters.Fire;
 import model.disasters.GasLeak;
@@ -29,139 +28,158 @@ public class Simulator {
 	private Address[][] world;
 
 	public Simulator() throws IOException {
-		makeWorld();
-		loadUnits("res/units.csv");
-		loadBuildings("res/buildings.csv");
-		loadCitizens("res/citizens.csv");
-		loadDisasters("res/disasters.csv");
-		executedDisasters = new ArrayList<>();
-
-	}
-
-	private void makeWorld() {
 		world = new Address[10][10];
-		for (int i = 0; i < world.length; i++) {
-			for (int j = 0; j < world[i].length; j++) {
+		for (int i = 0; i < 10; i++) {
+			for (int j = 0; j < 10; j++) {
 				world[i][j] = new Address(i, j);
 			}
 		}
+		executedDisasters = new ArrayList<>();
+		citizens = new ArrayList<Citizen>();
+		emergencyUnits = new ArrayList<Unit>();
+		plannedDisasters = new ArrayList<Disaster>();
+		buildings = new ArrayList<ResidentialBuilding>();
+		loadCitizens("citizens.csv");
+		loadBuildings("buildings.csv");
+		loadUnits("units.csv");
+		loadDisasters("disasters.csv");
+	}
+
+	
+	public ArrayList<String> readfile(String filePath) throws IOException {
+		ArrayList<String> arr = new ArrayList<String>();
+		String currentLine = "";
+		FileReader fileReader = new FileReader(filePath);
+		BufferedReader br = new BufferedReader(fileReader);
+		while ((currentLine = br.readLine()) != null) {
+			arr.add(currentLine);
+		}
+		br.close();
+		return arr;
 	}
 
 	private void loadUnits(String filePath) throws IOException {
-		ArrayList<String> units = readFile(filePath);
-		emergencyUnits = new ArrayList<>();
-		for (String unitLine : units) {
-			String[] data = unitLine.split(",");
-			String type = data[0];
-			String unitID = data[1];
-			int stepsPerCycle = Integer.parseInt(data[2]);
-			Address location = world[0][0];
-			Unit unit = null;
-			switch (type) {
-			case "AMB":
-				unit = new Ambulance(unitID, location, stepsPerCycle);
-				break;
-			case "DCU":
-				unit = new DiseaseControlUnit(unitID, location, stepsPerCycle);
-				break;
-			case "FTK":
-				unit = new FireTruck(unitID, location, stepsPerCycle);
-				break;
-			case "GCU":
-				unit = new GasControlUnit(unitID, location, stepsPerCycle);
-				break;
-			default: // EVC
-				int cap = Integer.parseInt(data[3]);
-				unit = new Evacuator(unitID, location, stepsPerCycle, cap);
-				break;
-			}
-			emergencyUnits.add(unit);
+		String x = "";
+		String y = "";
+		int z = 0;
+		int r = 0;
+		ArrayList<String> b = readfile(filePath);
+
+		for (int i = 0; i < b.size(); i++) {
+			String Line = b.get(i);
+			String[] q = Line.split(",");
+			y = q[1];
+			x = q[0];
+			z = Integer.parseInt(q[2]);
+			if (x.equals("EVC")) {
+				r = Integer.parseInt(q[3]);
+				emergencyUnits.add(new Evacuator(y, world[0][0], z, r));
+			} else if (x.equals("AMB"))
+				emergencyUnits.add(new Ambulance(y, world[0][0], z));
+			else if (x.equals("DCU"))
+				emergencyUnits.add(new DiseaseControlUnit(y, world[0][0], z));
+			else if (x.equals("FTK"))
+				emergencyUnits.add(new FireTruck(y, world[0][0], z));
+			else if (x.equals("GCU"))
+				emergencyUnits.add(new GasControlUnit(y, world[0][0], z));
+
 		}
 	}
 
 	private void loadBuildings(String filePath) throws IOException {
-		ArrayList<String> bs = readFile(filePath);
-		buildings = new ArrayList<>();
-		for (String buildingLine : bs) {
-			String[] data = buildingLine.split(",");
-			int x = Integer.parseInt(data[0]);
-			int y = Integer.parseInt(data[1]);
-			buildings.add(new ResidentialBuilding(world[x][y]));
+		int x = 0;
+		int y = 0;
+		ArrayList<String> b = readfile(filePath);
+
+		for (int i = 0; i < b.size(); i++) {
+			String Line = b.get(i);
+			String[] q = Line.split(",");
+			x = Integer.parseInt(q[0]);
+			y = Integer.parseInt(q[1]);
+			ResidentialBuilding building = new ResidentialBuilding(world[x][y]);
+			building.getOccupants().addAll(findCitizens(x, y));
+			buildings.add(building);
 		}
+
+	}
+
+	private ArrayList<Citizen> findCitizens(String x, String y) {
+		return findCitizens(Integer.parseInt(x), Integer.parseInt(y));
+	}
+
+	private ArrayList<Citizen> findCitizens(int x, int y) {
+		ArrayList<Citizen> cs = new ArrayList<>();
+		for (Citizen citizen : citizens) {
+			if (citizen.getLocation().getX() == x && citizen.getLocation().getY() == y)
+				cs.add(citizen);
+		}
+
+		return cs;
 	}
 
 	private void loadCitizens(String filePath) throws IOException {
-		ArrayList<String> cs = readFile(filePath);
-		citizens = new ArrayList<>();
-		for (String citizenLine : cs) {
-			String[] data = citizenLine.split(",");
-			int x = Integer.parseInt(data[0]);
-			int y = Integer.parseInt(data[1]);
-			Address location = world[x][y];
-			String id = data[2];
-			String name = data[3];
-			int age = Integer.parseInt(data[4]);
-			Citizen citizen = new Citizen(location, id, name, age);
-			citizens.add(citizen);
+		int x = 0;
+		int y = 0;
+		String id = "";
+		String name = "";
+		int age = 0;
+		ArrayList<String> b = readfile(filePath);
+		for (int i = 0; i < b.size(); i++) {
+			String Line = b.get(i);
+			String[] q = Line.split(",");
+			x = Integer.parseInt(q[0]);
+			y = Integer.parseInt(q[1]);
+			id = q[2];
+			name = q[3];
+			age = Integer.parseInt(q[4]);
+			citizens.add(new Citizen(world[x][y], id, name, age));
 		}
+	}
+
+	public Citizen targetCitzien(String NationalID) {
+		for (int i = 0; i < citizens.size(); i++) {
+			if (citizens.get(i).getNationalID().equals(NationalID))
+				return citizens.get(i);
+		}
+		return null;
+
+	}
+
+	public ResidentialBuilding targetBuilding(int x, int y) {
+		for (int i = 0; i < buildings.size(); i++) {
+			if (buildings.get(i).getLocation().getX() == x && buildings.get(i).getLocation().getY() == y)
+				return buildings.get(i);
+		}
+		return null;
 	}
 
 	private void loadDisasters(String filePath) throws IOException {
-		ArrayList<String> ds = readFile(filePath);
-		plannedDisasters = new ArrayList<>();
-		for (String disasterLine : ds) {
-			String[] data = disasterLine.split(",");
-			int startCycle = Integer.parseInt(data[0]);
-			String type = data[1];
-			String id = data[2];
-			Disaster disaster = null;
-			switch (type) {
-			case "INJ":
-				disaster = new Injury(startCycle, findCitizen(id));
-				break;
-			case "INF":
-				disaster = new Infection(startCycle, findCitizen(id));
-				break;
-			case "FIR":
-				disaster = new Fire(startCycle, findBuilding(data[2], data[3]));
-			default: // "GLK"
-				disaster = new GasLeak(startCycle, findBuilding(data[2], data[3]));
-				break;
+		int x = 0;
+		String y = "";
+		String target_id = "";
+
+		ArrayList<String> b = readfile(filePath);
+
+		for (int i = 0; i < b.size(); i++) {
+			String Line = b.get(i);
+			String[] q = Line.split(",");
+			x = Integer.parseInt(q[0]);// start cycle
+			y = q[1];// Disaster type
+			target_id = q[2];
+			int w = 0;
+			if (y.equals("INJ"))
+				plannedDisasters.add(new Injury(x, targetCitzien(target_id)));
+			else if (y.equals("INF"))
+				plannedDisasters.add(new Infection(x, targetCitzien(target_id)));
+			else if (y.equals("FIR")) {
+				w = Integer.parseInt(q[3]);
+				plannedDisasters.add(new Fire(x, targetBuilding(Integer.parseInt(target_id), w)));
 			}
-			plannedDisasters.add(disaster);
+			else  {
+				w = Integer.parseInt(q[3]);
+				plannedDisasters.add(new GasLeak(x, targetBuilding(Integer.parseInt(target_id), w)));
+			}
 
 		}
-	}
-
-	private ResidentialBuilding findBuilding(String x, String y) {
-		return findBuilding(Integer.parseInt(x), Integer.parseInt(y));
-	}
-
-	private ResidentialBuilding findBuilding(int x, int y) {
-		for (ResidentialBuilding building : buildings) {
-			if (building.getLocation().getX() == x && building.getLocation().getY() == y)
-				return building;
-		}
-		return null;
-	}
-
-	private Citizen findCitizen(String id) {
-		for (Citizen citizen : citizens) {
-			if (citizen.getNationalID().equals(id))
-				return citizen;
-		}
-		return null;
-	}
-
-	private ArrayList<String> readFile(String path) throws IOException {
-		FileReader fileReader = new FileReader(path);
-		BufferedReader reader = new BufferedReader(fileReader);
-		String line = null;
-		ArrayList<String> lines = new ArrayList<>();
-		while ((line = reader.readLine()) != null) {
-			lines.add(line);
-		}
-		reader.close();
-		return lines;
 	}
 }
