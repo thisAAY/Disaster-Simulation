@@ -4,10 +4,18 @@ package view;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.Panel;
+import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.nio.ByteOrder;
 
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -15,38 +23,36 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import controller.CommandCenter;
+import controller.GUIListener;
 
 public class MainScreen extends JFrame{
 	
 	
-	private CommandCenter controller;
-	private JPanel contentPanel;
+	//private CommandCenter controller;
 	private Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	private JButton exitButton;
 	private CityPanel cityPanel;
-	public MainScreen (CommandCenter controller)
+	private ControlPanel controlPanel;
+	private GUIListener guiListener;
+	private AvailableUnitsPanel availableUnitsPanel;
+	public MainScreen (GUIListener guiListener)
 	{
-		this.controller = controller;
+		this.guiListener = guiListener;
 		setTitle("Disasters");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		getContentPane().setBackground(GUIHelper.SIMI_BLACK);
-		setLayout(null);
-		addScreenButtons();
+		addKeyListener(ESCButtonListener.getInstance());
+		setLayout(new BorderLayout());
+		setFocusable(true);
+		//addScreenButtons();
 		makeFullScreen();
-		addCity();
+		addGameControl();
 		setVisible(true);
 	}
 	private void makeFullScreen()
 	{
 		setExtendedState(JFrame.MAXIMIZED_BOTH); 
 		setUndecorated(true);
-		contentPanel = new JPanel();
-		int h = screenSize.height - exitButton.getSize().height;
-		contentPanel.setBounds(0,50,screenSize.width,h);
-		contentPanel.setLayout(new BorderLayout());
-		contentPanel.setBackground(GUIHelper.SIMI_BLACK);
-		validate();
-		add(contentPanel);
 	}
 	private void addScreenButtons()
 	{
@@ -57,13 +63,39 @@ public class MainScreen extends JFrame{
 	    add(exitButton);
 		validate();
 	}
-	private void addCity()
+	private void addGameControl()
 	{
-		cityPanel =  new CityPanel(controller);
-		contentPanel.add(cityPanel);
+	
+		JPanel gameControl =  new JPanel();
+		gameControl.setBackground(GUIHelper.SIMI_BLACK);
+		gameControl.setBorder(BorderFactory.createEmptyBorder(16, 16, 4, 4));
+		gameControl.addKeyListener(ESCButtonListener.getInstance());
+		gameControl.setLayout(new BoxLayout(gameControl,BoxLayout.Y_AXIS));
+		gameControl.setPreferredSize(new Dimension(500,screenSize.height));
+		
+		controlPanel = new ControlPanel(guiListener);
+		controlPanel.addKeyListener(ESCButtonListener.getInstance());
+		
+		availableUnitsPanel =  new AvailableUnitsPanel();
+		availableUnitsPanel.addKeyListener(ESCButtonListener.getInstance());
+			
+		cityPanel =  new CityPanel();
+		cityPanel.addKeyListener(ESCButtonListener.getInstance());
+		
+		
+		gameControl.add(controlPanel);
+		gameControl.add(availableUnitsPanel);
+		gameControl.add(cityPanel);
+		add(gameControl,BorderLayout.LINE_START);
 	}
 	public CityPanel getCityPanel() {
 		return cityPanel;
 	}
-	
+	public ControlPanel getControlPanel() {
+		return controlPanel;
+	}
+	public AvailableUnitsPanel getAvailableUnitsPanel() {
+		return availableUnitsPanel;
+	}
+		
 }

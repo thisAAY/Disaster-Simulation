@@ -128,6 +128,20 @@ public class Citizen implements Rescuable,Simulatable{
 		emergencyService.receiveSOSCall(this);
 		
 	}
+
+	@Override
+	public String toString() {
+		return String.format("Name: %s\nState: %s\nID: %s<br>Age: %s\nhp: %s\nBloodLoss: %s\nToxicity: %s\nLocation: %s\nDisaster: %s", 
+				getName(),state,getNationalID(),getAge(),getHp(),getBloodLoss(),getToxicity(),getLocation(),getDisasterName());
+	}
+	
+	private String getDisasterName()
+	{
+		if(disaster == null)
+			return "No Disaster";
+		else 
+			return getDisaster().getClass().getSimpleName();
+	}
 	
 	
 }

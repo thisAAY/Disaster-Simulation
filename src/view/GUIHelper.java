@@ -15,8 +15,9 @@ import javax.swing.JButton;
 public class GUIHelper {
 	public static Color SIMI_BLACK = new Color(51, 56, 64);
 	public static Color SIMI_WHITE = new Color(173, 175, 179);
+	public static Color BUILDING_COLOR = new Color (245,203,92);
+	public static Color CITIZEN_COLOR = new Color (109,211,206);
 
-	
 	public static JButton makeImageButton(String path) {
 		try {	
 			BufferedImage buttonIcon = ImageIO.read(new File(path));

@@ -37,14 +37,7 @@ public class Simulator implements WorldListener  {
 	private SOSListener emergencyService;
 
 	
-	public ArrayList<ResidentialBuilding> getBuildings() {
-		return buildings;
-	}
-
-	public ArrayList<Citizen> getCitizens() {
-		return citizens;
-	}
-
+	
 	public Simulator(SOSListener l) throws Exception {
 		emergencyService = l;
 
@@ -335,6 +328,11 @@ public class Simulator implements WorldListener  {
 		}
 		return count;
 
+	}
+	
+
+	public int getCurrentCycle() {
+		return currentCycle;
 	}
 
 	public ArrayList<Unit> getEmergencyUnits() {

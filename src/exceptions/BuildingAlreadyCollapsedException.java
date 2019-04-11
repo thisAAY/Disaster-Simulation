@@ -1,5 +1,7 @@
 package exceptions;
 
+import javax.swing.JOptionPane;
+
 import model.disasters.Disaster;
 
 public class BuildingAlreadyCollapsedException extends DisasterException{
