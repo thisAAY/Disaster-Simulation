@@ -14,61 +14,43 @@ import simulation.Rescuable;
 
 public class Evacuator extends PoliceUnit {
 
-	public Evacuator(String unitID, Address location, int stepsPerCycle,
-			WorldListener worldListener, int maxCapacity) {
+	public Evacuator(String unitID, Address location, int stepsPerCycle, WorldListener worldListener, int maxCapacity) {
 		super(unitID, location, stepsPerCycle, worldListener, maxCapacity);
 
 	}
-	
-	
-	
-	
-	
-	
 
 	@Override
 	public void treat() {
 		ResidentialBuilding target = (ResidentialBuilding) getTarget();
-		
-		
-		if (target.getStructuralIntegrity() == 0
-				|| target.getOccupants().size() == 0) {
+
+		if (target.getStructuralIntegrity() == 0 || target.getOccupants().size() == 0) {
 			jobsDone();
 			return;
 		}
 
-		for (int i = 0; getPassengers().size() != getMaxCapacity()
-				&& i < target.getOccupants().size(); i++) {
+		for (int i = 0; getPassengers().size() != getMaxCapacity() && i < target.getOccupants().size(); i++) {
 			getPassengers().add(target.getOccupants().remove(i));
 			i--;
 		}
 
-		setDistanceToBase(target.getLocation().getX()
-				+ target.getLocation().getY());
+		setDistanceToBase(target.getLocation().getX() + target.getLocation().getY());
 
-	
+	}
 
-}
 	public void respond(Rescuable r) throws IncompatibleTargetException, CannotTreatException {
-		if( r instanceof Citizen) {
-			Citizen target=(Citizen)r;
+		if (r instanceof Citizen) {
+			Citizen target = (Citizen) r;
 			IncompatibleTargetException a = new IncompatibleTargetException(this, target, "IncompatibleTarget");
 			throw a;
-		}else if(this.canTreat(r)==false ||((ResidentialBuilding)r).getDisaster() instanceof GasLeak||((ResidentialBuilding)r).getDisaster() instanceof Fire) {
-			ResidentialBuilding target=(ResidentialBuilding)r;
+		} else if (this.canTreat(r) == false || ((ResidentialBuilding) r).getDisaster() instanceof GasLeak
+				|| ((ResidentialBuilding) r).getDisaster() instanceof Fire) {
+			ResidentialBuilding target = (ResidentialBuilding) r;
 			CannotTreatException a = new CannotTreatException(this, target, " CannotTreatException");
 			throw a;
-		}else {
-		super.respond(r);
+		} else {
+			super.respond(r);
 		}
-		
-		
-		
-		
-		
-		
-		
-		
+
 	}
-	
+
 }

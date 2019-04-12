@@ -1,6 +1,8 @@
 package view;
 
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -22,16 +24,27 @@ public class GUIHelper {
 		try {	
 			BufferedImage buttonIcon = ImageIO.read(new File(path));
 			JButton button = new JButton(new ImageIcon(buttonIcon));
-			button.setBorder(BorderFactory.createEmptyBorder());
-			button.setContentAreaFilled(false);
-			button.setBorderPainted(false);
+			button.setBackground(SIMI_BLACK);
 			return button;
 		} catch (IOException e) {
 			System.out.println("Can't read the image");
 			e.printStackTrace();
 			return null;
 		}
-
+	}
+	
+	public static JButton makeScalledImageButton(String path,Dimension size) {
+		try {	
+			BufferedImage buttonIcon = ImageIO.read(new File(path));
+			Image img =buttonIcon.getScaledInstance(size.width, size.height, Image.SCALE_SMOOTH);
+			JButton button = new JButton(new ImageIcon(img));
+			button.setBackground(SIMI_BLACK);
+			return button;
+		} catch (IOException e) {
+			System.out.println("Can't read the image");
+			e.printStackTrace();
+			return null;
+		}
 	}
 	public static class ExitListener implements ActionListener 
 	{

@@ -1,6 +1,7 @@
 package controller;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
@@ -13,6 +14,7 @@ import org.omg.CORBA.CTX_RESTRICT_SCOPE;
 import exceptions.BuildingAlreadyCollapsedException;
 import exceptions.CannotTreatException;
 import exceptions.CitizenAlreadyDeadException;
+import exceptions.IncompatibleTargetException;
 import model.events.SOSListener;
 import model.infrastructure.ResidentialBuilding;
 import model.people.Citizen;
@@ -35,7 +37,7 @@ public class CommandCenter implements SOSListener,GUIListener {
 	private ArrayList<ResidentialBuilding> visibleBuildings;
 	private ArrayList<Citizen> visibleCitizens;
 	private ArrayList<Unit> emergencyUnits;
-	
+	private Unit selectedUnit;
 	
 	private MainScreen mainScreen;
 	public CommandCenter() throws Exception {
@@ -63,7 +65,11 @@ public class CommandCenter implements SOSListener,GUIListener {
 		for(Unit u : emergencyUnits)
 		{
 			if(u.getState() == UnitState.IDLE)
-				btns.add(GUIHelper.makeImageButton(getImagePath(u)));
+			{
+				JButton btn =  GUIHelper.makeImageButton(getImagePath(u));
+				btn.putClientProperty("unit", u);
+				btns.add(btn);
+			}
 		}
 		return btns;
 	}
@@ -96,12 +102,23 @@ public class CommandCenter implements SOSListener,GUIListener {
 			JButton button = btns[citizen.getLocation().getX()] [citizen.getLocation().getY()];
 			button.setToolTipText("<html>" + citizen.toString().replaceAll("\n", "<br>") + "</html>");
 			button.setBackground(GUIHelper.CITIZEN_COLOR);
+			button.putClientProperty("target", citizen);
 		}
 		for(ResidentialBuilding building : visibleBuildings)
 		{
 			JButton button = btns[building.getLocation().getX()] [building.getLocation().getY()];
 			button.setToolTipText("<html>" + building.toString().replaceAll("\n", "<br>") + "</html>");
+			button.putClientProperty("target", building);
 			button.setBackground(GUIHelper.BUILDING_COLOR);
+		}
+//		
+		for(Unit unit : emergencyUnits)
+		{
+			JButton button = btns[unit.getLocation().getX()] [unit.getLocation().getY()];
+			JButton unitBtn = GUIHelper.makeScalledImageButton(getImagePath(unit),new Dimension(32, 32));
+			unitBtn.setBackground(button.getBackground());
+			unitBtn.setMaximumSize(button.getSize());
+			btns[unit.getLocation().getX()] [unit.getLocation().getY()] = unitBtn;
 		}
 		return btns;
 	}
@@ -112,6 +129,7 @@ public class CommandCenter implements SOSListener,GUIListener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 	}
 	@Override
 	public void receiveSOSCall(Rescuable r) {
@@ -138,6 +156,8 @@ public class CommandCenter implements SOSListener,GUIListener {
 		try {
 			engine.nextCycle();
 			mainScreen.getCityPanel().updateCells(createCells());
+			buildAvailableUnits();
+
 			mainScreen.getControlPanel().updateCurrentCycle(engine.getCurrentCycle());
 			mainScreen.getControlPanel().updateNumberOfCausalties(engine.calculateCasualties());
 
@@ -151,6 +171,35 @@ public class CommandCenter implements SOSListener,GUIListener {
 			JOptionPane.showMessageDialog(null, e.getMessage());
 		}
 		
+	}
+	@Override
+	public void onUnitSelected(JButton btn) {
+		Unit u = (Unit) btn.getClientProperty("unit");
+		selectedUnit = u;
+	}
+	@Override
+	public void onUnSelectUnit() {
+		selectedUnit = null;
+	}
+	@Override
+	public void onCellSelected(JButton btn) {
+		Object obj =  btn.getClientProperty("target");
+		if(obj != null)
+		{
+			Rescuable target = (Rescuable) obj;
+			if(selectedUnit != null)
+			{
+				try {
+					selectedUnit.respond(target);
+					selectedUnit = null;
+					buildAvailableUnits();
+				} catch (CannotTreatException e) {
+					JOptionPane.showMessageDialog(null, e.getMessage(), "Can't treat", JOptionPane.ERROR_MESSAGE);
+				} catch (IncompatibleTargetException e) {
+					JOptionPane.showMessageDialog(null, e.getMessage(), "Incompatabile target", JOptionPane.ERROR_MESSAGE);
+				};
+			}
+		}
 	}
 
 }

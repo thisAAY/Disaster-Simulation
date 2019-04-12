@@ -1,11 +1,12 @@
+/ambulance.png
+/close-circle.png
 /controller/
+/diseaseUnit.png
 /exceptions/
+/fire-truck.png
 /model/
+/police-van.png
 /simulation/
 /tests/
-/view/
-/fire-truck.png
-/ambulance.png
-/police-van.png
-/diseaseUnit.png
 /train.png
+/view/

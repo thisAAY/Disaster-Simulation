@@ -76,10 +76,10 @@ public class MainScreen extends JFrame{
 		controlPanel = new ControlPanel(guiListener);
 		controlPanel.addKeyListener(ESCButtonListener.getInstance());
 		
-		availableUnitsPanel =  new AvailableUnitsPanel();
+		availableUnitsPanel =  new AvailableUnitsPanel(guiListener);
 		availableUnitsPanel.addKeyListener(ESCButtonListener.getInstance());
 			
-		cityPanel =  new CityPanel();
+		cityPanel =  new CityPanel(guiListener);
 		cityPanel.addKeyListener(ESCButtonListener.getInstance());
 		
 		
