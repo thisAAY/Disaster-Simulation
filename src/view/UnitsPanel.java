@@ -17,12 +17,12 @@ import javax.swing.ScrollPaneLayout;
 import controller.GUIListener;
 import model.units.Unit;
 
-public class AvailableUnitsPanel extends JPanel implements ActionListener {
+public class UnitsPanel extends JPanel implements ActionListener {
 	private JPanel content;
 	private JScrollPane scrollPane;
 	private JButton selectedButton;
 	private GUIListener listener;
-	public AvailableUnitsPanel(GUIListener listener) {
+	public UnitsPanel(GUIListener listener) {
 		this.listener = listener;
 		content = new JPanel();
 		content.setAutoscrolls(true);
@@ -36,7 +36,7 @@ public class AvailableUnitsPanel extends JPanel implements ActionListener {
 		scrollPane.setPreferredSize(new Dimension(480, 80));
 		setMaximumSize(content.getPreferredSize());
 		add(scrollPane);
-		validate();
+		revalidate();
 	}
 
 	public void updateUnits(ArrayList<JButton> btns) {

@@ -115,8 +115,15 @@ public class ResidentialBuilding implements Rescuable, Simulatable
 	}
 	@Override
 	public String toString() {
-		return String.format("Structural Integrity: %s\nFire Damage: %s\nGas Level: %s\nFoundation Damage: %s\nOccupants: %s\nLocation: %s\nDisaster: %s", 
-				getStructuralIntegrity(),getFireDamage(),getGasLevel(),getFoundationDamage(),getOccupants().size(),getLocation(),getDisasterName());
+		return String.format("Structural Integrity: %s\nFire Damage: %s\nGas Level: %s\nFoundation Damage: %s\nLocation: %s\nDisaster: %s\nOccupants: %s", 
+				getStructuralIntegrity(),getFireDamage(),getGasLevel(),getFoundationDamage(),getLocation(),getDisasterName(),getOccupants().size());
+	}
+	public  String getCitizensString()
+	{
+		String lines = "";
+		for(Citizen c : getOccupants())
+			lines += c +",\n";
+		return "{\n" + lines + "}";
 	}
 	private String getDisasterName()
 	{

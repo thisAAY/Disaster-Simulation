@@ -2,12 +2,17 @@ package controller;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import javax.swing.text.DefaultEditorKit.InsertContentAction;
 
 import org.omg.CORBA.CTX_RESTRICT_SCOPE;
 
@@ -15,6 +20,12 @@ import exceptions.BuildingAlreadyCollapsedException;
 import exceptions.CannotTreatException;
 import exceptions.CitizenAlreadyDeadException;
 import exceptions.IncompatibleTargetException;
+import model.disasters.Collapse;
+import model.disasters.Disaster;
+import model.disasters.Fire;
+import model.disasters.GasLeak;
+import model.disasters.Infection;
+import model.disasters.Injury;
 import model.events.SOSListener;
 import model.infrastructure.ResidentialBuilding;
 import model.people.Citizen;
@@ -48,25 +59,30 @@ public class CommandCenter implements SOSListener,GUIListener {
 		mainScreen = new MainScreen(this);
 		
 		buildCity();
-		buildAvailableUnits();
+		buildUnits();
 
 	}
-	public void buildAvailableUnits()
+	public void buildUnits()
 	{
-		mainScreen.getAvailableUnitsPanel().updateUnits(createUnits());
+		mainScreen.getAvailableUnitsPanel().updateUnits(createUnits(UnitState.IDLE));
+		mainScreen.getRespondingUnitsPanel().updateUnits(createUnits(UnitState.RESPONDING));
+		mainScreen.getTreatingUnitsPanel().updateUnits(createUnits(UnitState.TREATING));
+
 	}
+	
 	public void buildCity()
 	{
 		mainScreen.getCityPanel().updateCells(createCells());
 	}
-	public ArrayList<JButton> createUnits()
+	public ArrayList<JButton> createUnits(UnitState state)
 	{
 		ArrayList<JButton> btns = new ArrayList<JButton>();
 		for(Unit u : emergencyUnits)
 		{
-			if(u.getState() == UnitState.IDLE)
+			if(u.getState() == state)
 			{
-				JButton btn =  GUIHelper.makeImageButton(getImagePath(u));
+				JButton btn =  GUIHelper.makeScalledImageButton(getImagePath(u),new Dimension(48,48));
+				btn.setToolTipText("<html>" + u.toString().replaceAll("\n", "<br>") + "</html>");
 				btn.putClientProperty("unit", u);
 				btns.add(btn);
 			}
@@ -97,30 +113,98 @@ public class CommandCenter implements SOSListener,GUIListener {
 				button.setBackground(Color.white);
 				btns[i][j] = button;
 			}
-		for(Citizen citizen : visibleCitizens)
-		{
-			JButton button = btns[citizen.getLocation().getX()] [citizen.getLocation().getY()];
-			button.setToolTipText("<html>" + citizen.toString().replaceAll("\n", "<br>") + "</html>");
-			button.setBackground(GUIHelper.CITIZEN_COLOR);
-			button.putClientProperty("target", citizen);
-		}
 		for(ResidentialBuilding building : visibleBuildings)
 		{
 			JButton button = btns[building.getLocation().getX()] [building.getLocation().getY()];
 			button.setToolTipText("<html>" + building.toString().replaceAll("\n", "<br>") + "</html>");
 			button.putClientProperty("target", building);
-			button.setBackground(GUIHelper.BUILDING_COLOR);
+			setColor(button,building);
+		}
+		for(Citizen citizen : visibleCitizens)
+		{
+			JButton button = btns[citizen.getLocation().getX()] [citizen.getLocation().getY()];
+			button.setToolTipText("<html>"+ citizen.toString().replaceAll("\n", "<br>") + "</html>");
+			setColor(button,citizen);
+			button.putClientProperty("target", citizen);
 		}
 //		
 		for(Unit unit : emergencyUnits)
 		{
-			JButton button = btns[unit.getLocation().getX()] [unit.getLocation().getY()];
-			JButton unitBtn = GUIHelper.makeScalledImageButton(getImagePath(unit),new Dimension(32, 32));
-			unitBtn.setBackground(button.getBackground());
-			unitBtn.setMaximumSize(button.getSize());
-			btns[unit.getLocation().getX()] [unit.getLocation().getY()] = unitBtn;
+			if(unit instanceof Evacuator)
+				continue;
+			btns[unit.getLocation().getX()] [unit.getLocation().getY()] = createUnitCell(btns,unit);
+		}
+
+		//Just to make sure that the evacuater will be shown if it was going from the building to base
+		for(Unit unit : emergencyUnits)
+		{
+			if(!(unit instanceof Evacuator))
+				continue;
+			btns[unit.getLocation().getX()] [unit.getLocation().getY()] = createUnitCell(btns,unit);
 		}
 		return btns;
+	}	
+	private JButton createUnitCell(JButton[][] btns,Unit unit)
+	{
+		JButton button = btns[unit.getLocation().getX()] [unit.getLocation().getY()];
+		JButton unitBtn = GUIHelper.makeScalledImageButton(getImagePath(unit),new Dimension(32, 32));
+		unitBtn.setBackground(button.getBackground());
+		unitBtn.setMaximumSize(button.getSize());
+		unitBtn.setToolTipText(button.getToolTipText());
+		return unitBtn;
+	}
+
+	private void setColor (JButton btn,Rescuable rescuable)
+	{
+		boolean isCitizen = rescuable instanceof Citizen;
+		Color color;
+		String iconPath = null;
+		if(rescuable.getDisaster() == null || !rescuable.getDisaster().isActive())
+		{
+			if(isCitizen)
+				color = GUIHelper.CITIZEN_COLOR;
+			else
+				color =GUIHelper.BUILDING_COLOR;
+		}
+		else
+		{
+			Disaster disaster =  rescuable.getDisaster();
+			if(disaster instanceof Collapse)
+			{
+				iconPath = "src\\coll.png";
+				color = GUIHelper.COLLAPSE_BUILDING;
+			}
+			else if(disaster instanceof Fire)
+			{
+				color = GUIHelper.FIRE_BUILDING;
+				iconPath = "src\\fire.png";
+			}
+			else if(disaster instanceof GasLeak)
+			{
+				iconPath = "src\\gasleak.png";
+				color = GUIHelper.GAS_LEAK_BUILDING;
+			}
+			else if(disaster instanceof Injury)
+			{
+				iconPath = "src\\bloodloss.png";
+				color = GUIHelper.FIRE_BUILDING;
+			}
+			else
+			{
+				iconPath = "src\\infection.png";
+				color = GUIHelper.GAS_LEAK_BUILDING;
+			}
+		}
+		btn.setBackground(color);
+		if(iconPath != null)
+		{
+			try {
+				btn.setIcon(new ImageIcon(ImageIO.read(new File(iconPath))));
+			} catch (IOException e) {
+				System.out.println("Cant read cell icon");
+				e.printStackTrace();
+			}
+		}
 	}
 	public static void main(String[] args) {
 		try {
@@ -156,7 +240,7 @@ public class CommandCenter implements SOSListener,GUIListener {
 		try {
 			engine.nextCycle();
 			mainScreen.getCityPanel().updateCells(createCells());
-			buildAvailableUnits();
+			buildUnits();
 
 			mainScreen.getControlPanel().updateCurrentCycle(engine.getCurrentCycle());
 			mainScreen.getControlPanel().updateNumberOfCausalties(engine.calculateCasualties());
@@ -192,7 +276,7 @@ public class CommandCenter implements SOSListener,GUIListener {
 				try {
 					selectedUnit.respond(target);
 					selectedUnit = null;
-					buildAvailableUnits();
+					buildUnits();
 				} catch (CannotTreatException e) {
 					JOptionPane.showMessageDialog(null, e.getMessage(), "Can't treat", JOptionPane.ERROR_MESSAGE);
 				} catch (IncompatibleTargetException e) {

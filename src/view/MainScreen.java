@@ -34,7 +34,7 @@ public class MainScreen extends JFrame{
 	private CityPanel cityPanel;
 	private ControlPanel controlPanel;
 	private GUIListener guiListener;
-	private AvailableUnitsPanel availableUnitsPanel;
+	private UnitsTaps unitsTaps;
 	public MainScreen (GUIListener guiListener)
 	{
 		this.guiListener = guiListener;
@@ -76,15 +76,15 @@ public class MainScreen extends JFrame{
 		controlPanel = new ControlPanel(guiListener);
 		controlPanel.addKeyListener(ESCButtonListener.getInstance());
 		
-		availableUnitsPanel =  new AvailableUnitsPanel(guiListener);
-		availableUnitsPanel.addKeyListener(ESCButtonListener.getInstance());
-			
+//		availableUnits =  new UnitsPanel(guiListener);
+//		availableUnits.addKeyListener(ESCButtonListener.getInstance());
+		unitsTaps =  new UnitsTaps(guiListener);
 		cityPanel =  new CityPanel(guiListener);
 		cityPanel.addKeyListener(ESCButtonListener.getInstance());
 		
 		
 		gameControl.add(controlPanel);
-		gameControl.add(availableUnitsPanel);
+		gameControl.add(unitsTaps);
 		gameControl.add(cityPanel);
 		add(gameControl,BorderLayout.LINE_START);
 	}
@@ -94,8 +94,16 @@ public class MainScreen extends JFrame{
 	public ControlPanel getControlPanel() {
 		return controlPanel;
 	}
-	public AvailableUnitsPanel getAvailableUnitsPanel() {
-		return availableUnitsPanel;
+
+	public UnitsPanel getAvailableUnitsPanel() {
+		return unitsTaps.getAvailableUnitsPnl();
+	}
+	public UnitsPanel getRespondingUnitsPanel() {
+		return unitsTaps.getRespondingUnitsPnl();
+	}
+	public UnitsPanel getTreatingUnitsPanel() {
+		return unitsTaps.getTreatingUnitsPnl();
 	}
 		
+	
 }

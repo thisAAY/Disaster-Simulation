@@ -132,4 +132,14 @@ public abstract class Unit implements Simulatable, SOSResponder {
 		}
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		String targetLoc = "";
+		if(getTarget() != null)
+			targetLoc = getTarget().getLocation().toString();
+		return String.format("Unit: %s\nID: %s\nState: %s\nLocation: %s\nTarget: %s\nDistance to target: %s\n Steps per cycle: %s",
+				getClass().getSimpleName(),getUnitID(),getState(),getLocation(),targetLoc,distanceToTarget,stepsPerCycle);
+	}
+	
 }
