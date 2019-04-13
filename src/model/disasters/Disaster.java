@@ -1,5 +1,6 @@
 package model.disasters;
 
+import controller.LogListener;
 import exceptions.BuildingAlreadyCollapsedException;
 import exceptions.CitizenAlreadyDeadException;
 import simulation.Rescuable;
@@ -9,6 +10,7 @@ public abstract class Disaster implements Simulatable {
 	private int startCycle;
 	private Rescuable target;
 	private boolean active;
+	private LogListener listener;
 	public Disaster(int startCycle, Rescuable target) {
 		this.startCycle = startCycle;
 		this.target = target;
@@ -27,8 +29,13 @@ public abstract class Disaster implements Simulatable {
 	}
 	public void strike() throws BuildingAlreadyCollapsedException, CitizenAlreadyDeadException 
 	{
-		
 		target.struckBy(this);
 		active=true;
+		if(listener != null)
+		listener.onDiasterStrick(this);
 	}
+	public void setListener(LogListener listener) {
+		this.listener = listener;
+	}
+	
 }

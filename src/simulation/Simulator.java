@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
 
+import controller.LogListener;
 import exceptions.BuildingAlreadyCollapsedException;
 import exceptions.CannotTreatException;
 import exceptions.CitizenAlreadyDeadException;
@@ -35,6 +36,8 @@ public class Simulator implements WorldListener  {
 	private ArrayList<Disaster> executedDisasters;
 	private Address[][] world;
 	private SOSListener emergencyService;
+	private LogListener logListener;
+	
 
 	
 	
@@ -65,7 +68,7 @@ public class Simulator implements WorldListener  {
 			}
 		}
 	}
-
+	
 	private void loadUnits(String path) throws Exception {
 		BufferedReader br = new BufferedReader(new FileReader(path));
 		String line = br.readLine();
@@ -159,20 +162,22 @@ public class Simulator implements WorldListener  {
 				int y = Integer.parseInt(info[3]);
 				building = getBuildingByLocation(world[x][y]);
 			}
+			Disaster disaster = null;
 			switch (info[1]) {
 			case "INJ":
-				plannedDisasters.add(new Injury(startCycle, citizen));
+				disaster = new Injury(startCycle, citizen);
 				break;
 			case "INF":
-				plannedDisasters.add(new Infection(startCycle, citizen));
+				disaster = new Infection(startCycle, citizen);
 				break;
 			case "FIR":
-				plannedDisasters.add(new Fire(startCycle, building));
+				disaster = new Fire(startCycle, building);
 				break;
 			case "GLK":
-				plannedDisasters.add(new GasLeak(startCycle, building));
+				disaster = new GasLeak(startCycle, building);
 				break;
 			}
+			plannedDisasters.add(disaster);
 			line = br.readLine();
 		}
 		br.close();
@@ -339,5 +344,14 @@ public class Simulator implements WorldListener  {
 
 		return emergencyUnits;
 	}
+
+	public void setLogListener(LogListener logListener) {
+		this.logListener = logListener;
+		for(Citizen citizen :  citizens)
+			citizen.setLogListener(logListener);
+		for(Disaster disaster : plannedDisasters)
+			disaster.setListener(logListener);
+	}
+	
 
 }

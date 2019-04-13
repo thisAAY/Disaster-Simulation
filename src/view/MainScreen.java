@@ -35,6 +35,8 @@ public class MainScreen extends JFrame{
 	private ControlPanel controlPanel;
 	private GUIListener guiListener;
 	private UnitsTaps unitsTaps;
+	private InfoPanel infoPanel;
+	private LogPanel logPanel;
 	public MainScreen (GUIListener guiListener)
 	{
 		this.guiListener = guiListener;
@@ -48,6 +50,7 @@ public class MainScreen extends JFrame{
 		makeFullScreen();
 		addGameControl();
 		setVisible(true);
+		addDataPanels();
 	}
 	private void makeFullScreen()
 	{
@@ -88,6 +91,17 @@ public class MainScreen extends JFrame{
 		gameControl.add(cityPanel);
 		add(gameControl,BorderLayout.LINE_START);
 	}
+	private void addDataPanels()
+	{
+		JPanel dataPanel =  new JPanel();
+		dataPanel.setLayout(new GridLayout(2, 1));
+		infoPanel = new InfoPanel();
+		logPanel =  new LogPanel();
+		dataPanel.add(infoPanel);
+		dataPanel.add(logPanel);
+		add(dataPanel);
+		
+	}
 	public CityPanel getCityPanel() {
 		return cityPanel;
 	}
@@ -104,6 +118,13 @@ public class MainScreen extends JFrame{
 	public UnitsPanel getTreatingUnitsPanel() {
 		return unitsTaps.getTreatingUnitsPnl();
 	}
+	public InfoPanel getInfoPanel() {
+		return infoPanel;
+	}
+	public LogPanel getLogPanel() {
+		return logPanel;
+	}
 		
+	
 	
 }

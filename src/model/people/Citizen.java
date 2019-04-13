@@ -3,6 +3,7 @@ package model.people;
 import simulation.Address;
 import simulation.Rescuable;
 import simulation.Simulatable;
+import controller.LogListener;
 import model.disasters.Disaster;
 import model.events.SOSListener;
 import model.events.WorldListener;
@@ -19,6 +20,7 @@ public class Citizen implements Rescuable,Simulatable{
 	private Address location;
 	private SOSListener emergencyService;
 	private WorldListener worldListener;
+	private LogListener logListener;
 	public Citizen(Address location,String nationalID, String name, int age
 			,WorldListener worldListener) {
 		this.name = name;
@@ -60,6 +62,8 @@ public class Citizen implements Rescuable,Simulatable{
 		else if(this.hp<=0){
 			this.hp = 0;
 			state=CitizenState.DECEASED;
+			if(logListener != null)
+				logListener.onCitizenDie(this);
 		}
 	}
 	public int getBloodLoss() {
@@ -119,6 +123,11 @@ public class Citizen implements Rescuable,Simulatable{
 		else if(toxicity>=70)
 			setHp(hp-15);
 	}
+	
+	public void setLogListener(LogListener logListener) {
+		this.logListener = logListener;
+	}
+
 	@Override
 	public void struckBy(Disaster d) {
 		if(disaster!=null)
