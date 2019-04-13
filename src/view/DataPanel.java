@@ -17,6 +17,8 @@ abstract public class  DataPanel extends JTextArea {
 		setSize(getSize());
 		setText(des);
 		setBorder(BorderFactory.createTitledBorder(null, title, 0, 0, getFont(), Color.WHITE));
+		
+		addKeyListener(ESCButtonListener.getInstance());
 	}
 	protected void updateData(String data,boolean deleteLast)
 	{
