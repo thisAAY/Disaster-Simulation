@@ -32,6 +32,9 @@ abstract public class  DataPanel extends JPanel {
 		caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);		pane.setBackground(GUIHelper.SIMI_BLACK);
 		pane.setBorder(BorderFactory.createEmptyBorder(4, 4, 0, 0));
 		add(pane);
+
+		
+		addKeyListener(ESCButtonListener.getInstance());
 	}
 	protected void updateData(String data,boolean deleteLast)
 	{
