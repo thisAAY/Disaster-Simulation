@@ -33,7 +33,8 @@ abstract public class  DataPanel extends JPanel {
 		pane.setBorder(BorderFactory.createEmptyBorder(4, 4, 0, 0));
 		add(pane);
 
-		
+		textArea.addKeyListener(ESCButtonListener.getInstance());
+		pane.addKeyListener(ESCButtonListener.getInstance());
 		addKeyListener(ESCButtonListener.getInstance());
 	}
 	protected void updateData(String data,boolean deleteLast)
