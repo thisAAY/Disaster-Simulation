@@ -31,6 +31,7 @@ import model.disasters.Injury;
 import model.events.SOSListener;
 import model.infrastructure.ResidentialBuilding;
 import model.people.Citizen;
+import model.people.CitizenState;
 import model.units.Ambulance;
 import model.units.DiseaseControlUnit;
 import model.units.Evacuator;
@@ -47,12 +48,13 @@ import view.MainScreen;
 
 public class CommandCenter implements SOSListener, GUIListener,LogListener {
 
+	
 	private Simulator engine;
 	private ArrayList<ResidentialBuilding> visibleBuildings;
 	private ArrayList<Citizen> visibleCitizens;
 	private ArrayList<Unit> emergencyUnits;
 	private Unit selectedUnit;
-
+	private Address selectedLocation;
 	private MainScreen mainScreen;
 
 	public CommandCenter() throws Exception {
@@ -113,12 +115,15 @@ public class CommandCenter implements SOSListener, GUIListener,LogListener {
 				button.setBorder(BorderFactory.createLineBorder(GUIHelper.SIMI_BLACK, 2));
 				button.setBackground(Color.white);
 				button.putClientProperty("location", new Address(i, j));
+
 				btns[i][j] = button;
 			}
 		for (ResidentialBuilding building : visibleBuildings) {
 			JButton button = btns[building.getLocation().getX()][building.getLocation().getY()];
 			button.setToolTipText("<html>" + building.toString().replaceAll("\n", "<br>") + "</html>");
 			button.putClientProperty("target", building);
+			button.putClientProperty("location", building.getLocation());
+
 			setColor(button, building);
 		}
 		for (Citizen citizen : visibleCitizens) {
@@ -126,6 +131,8 @@ public class CommandCenter implements SOSListener, GUIListener,LogListener {
 			button.setToolTipText("<html>" + citizen.toString().replaceAll("\n", "<br>") + "</html>");
 			setColor(button, citizen);
 			button.putClientProperty("target", citizen);
+			button.putClientProperty("location", citizen.getLocation());
+
 		}
 //		
 		for (Unit unit : emergencyUnits) {
@@ -152,7 +159,12 @@ public class CommandCenter implements SOSListener, GUIListener,LogListener {
 			BufferedImage buttonIcon;
 			buttonIcon = ImageIO.read(new File(getImagePath(unit)));
 			Image img = buttonIcon.getScaledInstance(32, 32, Image.SCALE_SMOOTH);
+			if( unit.getState() == UnitState.TREATING)
+				button.setBackground(GUIHelper.TREATING);
+			else if(unit.getState() == UnitState.RESPONDING)
+				button.setBackground(GUIHelper.RESPONDING);
 			button.setIcon(new ImageIcon(img));
+			button.putClientProperty("location", unit.getLocation());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -166,7 +178,12 @@ public class CommandCenter implements SOSListener, GUIListener,LogListener {
 		String iconPath = null;
 		if (rescuable.getDisaster() == null || !rescuable.getDisaster().isActive()) {
 			if (isCitizen)
+			{
 				color = GUIHelper.CITIZEN_COLOR;
+				Citizen citizen = (Citizen) rescuable;
+				if(citizen.getState() == CitizenState.DECEASED)
+					color = GUIHelper.DECEASED_CITIZEN;
+			}
 			else
 				color = GUIHelper.BUILDING_COLOR;
 		} else {
@@ -182,7 +199,7 @@ public class CommandCenter implements SOSListener, GUIListener,LogListener {
 				color = GUIHelper.GAS_LEAK_BUILDING;
 			} else if (disaster instanceof Injury) {
 				iconPath = "src\\bloodloss.png";
-				color = GUIHelper.FIRE_BUILDING;
+				color = GUIHelper.BLOOD_LOSS;
 			} else {
 				iconPath = "src\\infection.png";
 				color = GUIHelper.GAS_LEAK_BUILDING;
@@ -238,7 +255,8 @@ public class CommandCenter implements SOSListener, GUIListener,LogListener {
 
 			mainScreen.getControlPanel().updateCurrentCycle(engine.getCurrentCycle());
 			mainScreen.getControlPanel().updateNumberOfCausalties(engine.calculateCasualties());
-
+			if(selectedLocation != null)
+				printCell(selectedLocation.getX(), selectedLocation.getY());
 		} catch (CannotTreatException e) {
 
 			JOptionPane.showMessageDialog(null, e.getMessage());
@@ -256,6 +274,7 @@ public class CommandCenter implements SOSListener, GUIListener,LogListener {
 		Unit u = (Unit) btn.getClientProperty("unit");
 		selectedUnit = u;
 		mainScreen.getInfoPanel().updateData(u.toString());
+		selectedLocation = null;
 	}
 
 	@Override
@@ -270,20 +289,20 @@ public class CommandCenter implements SOSListener, GUIListener,LogListener {
 
 		for (ResidentialBuilding building : visibleBuildings)
 			if (building.getLocation().getX() == x && building.getLocation().getY() == y)
-				buildings += building.toString() + "\n" + building.getOccupants().toString();
+				buildings += applySpacesToString( building.toString() + "\n" + building.getOccupants().toString());
 		if(buildings != "")
 			buildings = "Buildings:\n" + buildings;
 		
 		for (Citizen citizen : visibleCitizens)
 			if (citizen.getLocation().getX() == x && citizen.getLocation().getY() == y)
-				citizens += citizen.toString() + "\n";
+				citizens += applySpacesToString(citizen.toString());
 		if(citizens != "")
 			citizens = "Citizens:\n" + citizens;
 		
 		
 		for (Unit unit : emergencyUnits)
 			if (unit.getLocation().getX() == x && unit.getLocation().getY() == y)
-				units += unit.toString() + "\n";
+				units += applySpacesToString(unit.toString()) ;
 		if(units != "")
 			units = "Units:\n" + units;
 		
@@ -291,13 +310,25 @@ public class CommandCenter implements SOSListener, GUIListener,LogListener {
 		if(lines != "")
 			mainScreen.getInfoPanel().updateData(lines);
 	}
-	
+	private String applySpacesToString(String s)
+	{
+		String[] lines = s.split("\n");
+		String ss = lines[0] +"\n";
+		for(int i = 1;i<lines.length;i++)
+		{
+			String line = lines[i];
+			ss += String.format("      %s\n",line);
+		}
+		return ss;
+	}
 	@Override
 	public void onCellSelected(JButton btn) {
 		Object obj = btn.getClientProperty("target");
+		Address location = (Address) btn.getClientProperty("location");
+		selectedLocation = location;
+		printCell(location.getX(), location.getY());
 		if (obj != null) {
 			Rescuable target = (Rescuable) obj;
-			printCell(target.getLocation().getX(), target.getLocation().getY());
 			if (selectedUnit != null) {
 				try {
 					selectedUnit.respond(target);

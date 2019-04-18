@@ -21,6 +21,8 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 
 import controller.CommandCenter;
 import controller.GUIListener;
@@ -37,6 +39,7 @@ public class MainScreen extends JFrame{
 	private UnitsTaps unitsTaps;
 	private InfoPanel infoPanel;
 	private LogPanel logPanel;
+	
 	public MainScreen (GUIListener guiListener)
 	{
 		this.guiListener = guiListener;
@@ -94,6 +97,8 @@ public class MainScreen extends JFrame{
 	private void addDataPanels()
 	{
 		JPanel dataPanel =  new JPanel();
+		dataPanel.setBackground(GUIHelper.SIMI_BLACK);
+		dataPanel.setBorder(BorderFactory.createEmptyBorder(8, 8, 6, 0));
 		dataPanel.setLayout(new GridLayout(2, 1));
 		infoPanel = new InfoPanel();
 		logPanel =  new LogPanel();

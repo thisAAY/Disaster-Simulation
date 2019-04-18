@@ -19,9 +19,13 @@ public class GUIHelper {
 	public static Color SIMI_WHITE = new Color(173, 175, 179);
 	public static Color BUILDING_COLOR = new Color (245,203,92);
 	public static Color CITIZEN_COLOR = new Color (109,211,206);
-	public static Color FIRE_BUILDING = new  Color(197,34,51);
+	public static Color FIRE_BUILDING = new   Color(217,93,57);
+	public static Color BLOOD_LOSS = new  Color(197,34,51);
 	public static Color GAS_LEAK_BUILDING = new Color(3,206,164);
 	public static Color COLLAPSE_BUILDING = new Color(0,0,34);
+	public static Color DECEASED_CITIZEN = new Color(15,17,12);
+	public static Color TREATING = new Color(68,157,209);
+	public static Color RESPONDING = new Color(68,161,160);
 	public static JButton makeImageButton(String path) {
 		try {	
 			BufferedImage buttonIcon = ImageIO.read(new File(path));

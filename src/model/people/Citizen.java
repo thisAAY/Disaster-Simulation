@@ -140,7 +140,7 @@ public class Citizen implements Rescuable,Simulatable{
 
 	@Override
 	public String toString() {
-		return String.format("Name: %s\nState: %s\nID: %s<br>Age: %s\nhp: %s\nBloodLoss: %s\nToxicity: %s\nLocation: %s\nDisaster: %s", 
+		return String.format("Name: %s\nState: %s\nID: %s\nAge: %s\nhp: %s\nBloodLoss: %s\nToxicity: %s\nLocation: %s\nDisaster: %s", 
 				getName(),state,getNationalID(),getAge(),getHp(),getBloodLoss(),getToxicity(),getLocation(),getDisasterName());
 	}
 	
