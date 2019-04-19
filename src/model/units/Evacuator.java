@@ -51,8 +51,4 @@ public class Evacuator extends PoliceUnit {
 			super.respond(r);
 		}
 	}
-
-	
-	
-
 }

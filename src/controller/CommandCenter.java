@@ -42,13 +42,13 @@ import model.units.UnitState;
 import simulation.Address;
 import simulation.Rescuable;
 import simulation.Simulator;
+import view.CitizensFrame;
 import view.ESCButtonListener;
 import view.GUIHelper;
 import view.MainScreen;
 
-public class CommandCenter implements SOSListener, GUIListener,LogListener {
+public class CommandCenter implements SOSListener, GUIListener, LogListener {
 
-	
 	private Simulator engine;
 	private ArrayList<ResidentialBuilding> visibleBuildings;
 	private ArrayList<Citizen> visibleCitizens;
@@ -159,9 +159,9 @@ public class CommandCenter implements SOSListener, GUIListener,LogListener {
 			BufferedImage buttonIcon;
 			buttonIcon = ImageIO.read(new File(getImagePath(unit)));
 			Image img = buttonIcon.getScaledInstance(32, 32, Image.SCALE_SMOOTH);
-			if( unit.getState() == UnitState.TREATING)
+			if (unit.getState() == UnitState.TREATING)
 				button.setBackground(GUIHelper.TREATING);
-			else if(unit.getState() == UnitState.RESPONDING)
+			else if (unit.getState() == UnitState.RESPONDING)
 				button.setBackground(GUIHelper.RESPONDING);
 			button.setIcon(new ImageIcon(img));
 			button.putClientProperty("location", unit.getLocation());
@@ -177,14 +177,12 @@ public class CommandCenter implements SOSListener, GUIListener,LogListener {
 		Color color;
 		String iconPath = null;
 		if (rescuable.getDisaster() == null || !rescuable.getDisaster().isActive()) {
-			if (isCitizen)
-			{
+			if (isCitizen) {
 				color = GUIHelper.CITIZEN_COLOR;
 				Citizen citizen = (Citizen) rescuable;
-				if(citizen.getState() == CitizenState.DECEASED)
+				if (citizen.getState() == CitizenState.DECEASED)
 					color = GUIHelper.DECEASED_CITIZEN;
-			}
-			else
+			} else
 				color = GUIHelper.BUILDING_COLOR;
 		} else {
 			Disaster disaster = rescuable.getDisaster();
@@ -228,16 +226,14 @@ public class CommandCenter implements SOSListener, GUIListener,LogListener {
 
 	@Override
 	public void receiveSOSCall(Rescuable r) {
-
 		if (r instanceof ResidentialBuilding) {
-
 			if (!visibleBuildings.contains(r))
 				visibleBuildings.add((ResidentialBuilding) r);
-
 		} else {
 
-			if (!visibleCitizens.contains(r))
+			if (!visibleCitizens.contains(r)) {
 				visibleCitizens.add((Citizen) r);
+			}
 		}
 
 	}
@@ -245,7 +241,8 @@ public class CommandCenter implements SOSListener, GUIListener,LogListener {
 	@Override
 	public void nextCycle() {
 		if (engine.checkGameOver()) {
-			JOptionPane.showMessageDialog(null, "Game Over");
+			JOptionPane.showMessageDialog(null, "Game Over your score is: " + engine.calculateCasualties());
+			System.exit(0);
 			return;
 		}
 		try {
@@ -255,7 +252,7 @@ public class CommandCenter implements SOSListener, GUIListener,LogListener {
 
 			mainScreen.getControlPanel().updateCurrentCycle(engine.getCurrentCycle());
 			mainScreen.getControlPanel().updateNumberOfCausalties(engine.calculateCasualties());
-			if(selectedLocation != null)
+			if (selectedLocation != null)
 				printCell(selectedLocation.getX(), selectedLocation.getY());
 		} catch (CannotTreatException e) {
 
@@ -289,38 +286,37 @@ public class CommandCenter implements SOSListener, GUIListener,LogListener {
 
 		for (ResidentialBuilding building : visibleBuildings)
 			if (building.getLocation().getX() == x && building.getLocation().getY() == y)
-				buildings += applySpacesToString( building.toString() + "\n" + building.getOccupants().toString());
-		if(buildings != "")
+				buildings += applySpacesToString(building.toString() + "\n" + building.getOccupants().toString());
+		if (buildings != "")
 			buildings = "Buildings:\n" + buildings;
-		
+
 		for (Citizen citizen : visibleCitizens)
 			if (citizen.getLocation().getX() == x && citizen.getLocation().getY() == y)
 				citizens += applySpacesToString(citizen.toString());
-		if(citizens != "")
+		if (citizens != "")
 			citizens = "Citizens:\n" + citizens;
-		
-		
+
 		for (Unit unit : emergencyUnits)
 			if (unit.getLocation().getX() == x && unit.getLocation().getY() == y)
-				units += applySpacesToString(unit.toString()) ;
-		if(units != "")
+				units += applySpacesToString(unit.toString());
+		if (units != "")
 			units = "Units:\n" + units;
-		
+
 		String lines = buildings + citizens + units;
-		if(lines != "")
+		if (lines != "")
 			mainScreen.getInfoPanel().updateData(lines);
 	}
-	private String applySpacesToString(String s)
-	{
+
+	private String applySpacesToString(String s) {
 		String[] lines = s.split("\n");
-		String ss = lines[0] +"\n";
-		for(int i = 1;i<lines.length;i++)
-		{
+		String ss = lines[0] + "\n";
+		for (int i = 1; i < lines.length; i++) {
 			String line = lines[i];
-			ss += String.format("      %s\n",line);
+			ss += String.format("      %s\n", line);
 		}
 		return ss;
 	}
+
 	@Override
 	public void onCellSelected(JButton btn) {
 		Object obj = btn.getClientProperty("target");
@@ -337,24 +333,41 @@ public class CommandCenter implements SOSListener, GUIListener,LogListener {
 				} catch (CannotTreatException e) {
 					JOptionPane.showMessageDialog(null, e.getMessage(), "Can't treat", JOptionPane.ERROR_MESSAGE);
 				} catch (IncompatibleTargetException e) {
-					JOptionPane.showMessageDialog(null, e.getMessage(), "Incompatabile target",
-							JOptionPane.ERROR_MESSAGE);
+					if (target instanceof ResidentialBuilding) {
+						ResidentialBuilding building = (ResidentialBuilding) target;
+						if (building.getOccupants().size() == 0)
+							JOptionPane.showMessageDialog(null, e.getMessage(), "Incompatabile target",
+									JOptionPane.ERROR_MESSAGE);
+						else
+							askToTargetOccupents(building);
+
+					}
 				}
 				;
 			}
 		}
 	}
+	public void askToTargetOccupents(ResidentialBuilding building)
+	{
+		 int reply = JOptionPane.showConfirmDialog(null, "Incompatabile target, Do u want to target it's occupents?", "Target occupents", JOptionPane.YES_NO_OPTION);
+	        if (reply == JOptionPane.YES_OPTION) {
+		          new CitizensFrame(this, building.getOccupants());
+	        }
+	}
 
 	@Override
 	public void onCitizenDie(Citizen citizen) {
 
-		mainScreen.getLogPanel().updateData(String.format("Citizen: %s has died in cycle %s", citizen.getName(),engine.getCurrentCycle()));
+		mainScreen.getLogPanel().updateData(
+				String.format("Citizen: %s has died in cycle %s", citizen.getName(), engine.getCurrentCycle()));
 	}
 
 	@Override
 	public void onDiasterStrick(Disaster disaster) {
-		mainScreen.getLogPanel().updateData(String.format("A new %s diaster has striked a %s in cycle %s", 
-				disaster.getClass().getSimpleName(),disaster.getTarget().getClass().getSimpleName(),engine.getCurrentCycle()));
+		mainScreen.getLogPanel()
+				.updateData(String.format("A new %s diaster has striked a %s in cycle %s",
+						disaster.getClass().getSimpleName(), disaster.getTarget().getClass().getSimpleName(),
+						engine.getCurrentCycle()));
 	}
 
 }

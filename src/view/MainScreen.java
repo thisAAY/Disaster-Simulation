@@ -54,6 +54,7 @@ public class MainScreen extends JFrame{
 		addGameControl();
 		setVisible(true);
 		addDataPanels();
+		
 	}
 	private void makeFullScreen()
 	{

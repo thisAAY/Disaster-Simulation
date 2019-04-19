@@ -61,9 +61,10 @@ public class Citizen implements Rescuable,Simulatable{
 			this.hp=100;
 		else if(this.hp<=0){
 			this.hp = 0;
-			state=CitizenState.DECEASED;
-			if(logListener != null)
+			if(logListener != null && state != CitizenState.DECEASED)
 				logListener.onCitizenDie(this);
+			state=CitizenState.DECEASED;
+			
 		}
 	}
 	public int getBloodLoss() {
