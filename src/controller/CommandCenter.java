@@ -348,12 +348,13 @@ public class CommandCenter implements SOSListener, GUIListener,LogListener {
 	@Override
 	public void onCitizenDie(Citizen citizen) {
 
-		mainScreen.getLogPanel().updateData(String.format("Citizen: %s has died", citizen.getName()));
+		mainScreen.getLogPanel().updateData(String.format("Citizen: %s has died in cycle %s", citizen.getName(),engine.getCurrentCycle()));
 	}
 
 	@Override
 	public void onDiasterStrick(Disaster disaster) {
-		mainScreen.getLogPanel().updateData(String.format("A new %s diaster has striked a %s", disaster.getClass().getSimpleName(),disaster.getTarget().getClass().getSimpleName()));
+		mainScreen.getLogPanel().updateData(String.format("A new %s diaster has striked a %s in cycle %s", 
+				disaster.getClass().getSimpleName(),disaster.getTarget().getClass().getSimpleName(),engine.getCurrentCycle()));
 	}
 
 }
