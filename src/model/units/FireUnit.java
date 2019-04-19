@@ -20,11 +20,11 @@ public abstract class FireUnit extends Unit {
 	public void respond (Rescuable r) throws CannotTreatException, IncompatibleTargetException{
 		if( r instanceof Citizen) {
 			Citizen target=(Citizen)r;
-			IncompatibleTargetException a = new IncompatibleTargetException(this, target, "IncompatibleTarget");
+			IncompatibleTargetException a = new IncompatibleTargetException(this, target, "You can't treat citizen with Fire Unit");
 			throw a;
 		}else if(this.canTreat(r)==false||((ResidentialBuilding)r).getDisaster() instanceof Collapse||((ResidentialBuilding)r).getDisaster() instanceof GasLeak ||((ResidentialBuilding)r).getDisaster() instanceof Injury) {
 			ResidentialBuilding target=(ResidentialBuilding)r;
-			CannotTreatException a = new CannotTreatException(this, target, " CannotTreatException");
+			CannotTreatException a = new CannotTreatException(this, target, "You can't treat this citizen");
 			throw a;
 		}else {
 		super.respond(r);

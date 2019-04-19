@@ -41,11 +41,11 @@ public class DiseaseControlUnit extends MedicalUnit {
 	public void respond(Rescuable r) throws CannotTreatException, IncompatibleTargetException {
 		if( r instanceof ResidentialBuilding) {
 			ResidentialBuilding target=(ResidentialBuilding)r;
-			IncompatibleTargetException a = new IncompatibleTargetException(this, target, " IncompatibleTarget");
+			IncompatibleTargetException a = new IncompatibleTargetException(this, target, "You can't treat a building with Disease Control Unit");
 			throw a;
 		}else if(this.canTreat(r)==false ||((Citizen)r).getDisaster() instanceof Collapse||((Citizen)r).getDisaster() instanceof Fire||((Citizen)r).getDisaster() instanceof Injury ) {
 			Citizen target=(Citizen)r;
-			CannotTreatException a = new CannotTreatException(this, target, " CannotTreatException");
+			CannotTreatException a = new CannotTreatException(this, target, "You can't treat this citizen");
 			throw a;
 		}
 		

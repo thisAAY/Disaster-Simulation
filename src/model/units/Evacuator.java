@@ -40,12 +40,12 @@ public class Evacuator extends PoliceUnit {
 	public void respond(Rescuable r) throws IncompatibleTargetException, CannotTreatException {
 		if (r instanceof Citizen) {
 			Citizen target = (Citizen) r;
-			IncompatibleTargetException a = new IncompatibleTargetException(this, target, "IncompatibleTarget");
+			IncompatibleTargetException a = new IncompatibleTargetException(this, target, "You can't treat citizen with an Evacuater");
 			throw a;
 		} else if (this.canTreat(r) == false || ((ResidentialBuilding) r).getDisaster() instanceof GasLeak
 				|| ((ResidentialBuilding) r).getDisaster() instanceof Fire) {
 			ResidentialBuilding target = (ResidentialBuilding) r;
-			CannotTreatException a = new CannotTreatException(this, target, " CannotTreatException");
+			CannotTreatException a = new CannotTreatException(this, target, "You can't treat this citizen");
 			throw a;
 		} else {
 			super.respond(r);

@@ -42,11 +42,11 @@ public class GasControlUnit extends FireUnit {
 	public void respond (Rescuable r) throws CannotTreatException, IncompatibleTargetException{
 		if( r instanceof Citizen) {
 			Citizen target=(Citizen)r;
-			IncompatibleTargetException a = new IncompatibleTargetException(this, target, "IncompatibleTarget");
+			IncompatibleTargetException a = new IncompatibleTargetException(this, target, "Can't treat citizen with Gas control unit");
 			throw a;
 		}else if(this.canTreat(r)==false||((ResidentialBuilding)r).getDisaster() instanceof Collapse||((ResidentialBuilding)r).getDisaster() instanceof Fire) {
 			ResidentialBuilding target=(ResidentialBuilding)r;
-			CannotTreatException a = new CannotTreatException(this, target, " CannotTreatException");
+			CannotTreatException a = new CannotTreatException(this, target, " You can't treat this citizen");
 			throw a;
 		}else {
 			ResidentialBuilding target=(ResidentialBuilding)r;

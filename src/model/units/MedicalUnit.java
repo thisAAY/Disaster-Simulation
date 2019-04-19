@@ -35,11 +35,11 @@ public abstract class MedicalUnit extends Unit {
 	public void respond(Rescuable r) throws IncompatibleTargetException, CannotTreatException {
 		if (r instanceof ResidentialBuilding) {
 			ResidentialBuilding target = (ResidentialBuilding) r;
-			IncompatibleTargetException a = new IncompatibleTargetException(this, target, "IncompatibleTarget");
+			IncompatibleTargetException a = new IncompatibleTargetException(this, target, "Can't treat building with Medical unit");
 			throw a;
 		} else if (this.canTreat(r) == false) {
 			ResidentialBuilding target = (ResidentialBuilding) r;
-			CannotTreatException a = new CannotTreatException(this, target, " CannotTreatException");
+			CannotTreatException a = new CannotTreatException(this, target, "You can't treat this citizen");
 			throw a;
 		}
 	}
