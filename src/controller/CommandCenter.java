@@ -359,7 +359,7 @@ public class CommandCenter implements SOSListener, GUIListener, LogListener {
 	public void onCitizenDie(Citizen citizen) {
 
 		mainScreen.getLogPanel().updateData(
-				String.format("Citizen: %s has died in cycle %s", citizen.getName(), engine.getCurrentCycle()));
+				String.format("Citizen: %s has died in location %s and  in cycle %s", citizen.getName(),citizen.getLocation(), engine.getCurrentCycle()));
 	}
 
 	@Override
@@ -368,6 +368,13 @@ public class CommandCenter implements SOSListener, GUIListener, LogListener {
 				.updateData(String.format("A new %s diaster has striked a %s in cycle %s",
 						disaster.getClass().getSimpleName(), disaster.getTarget().getClass().getSimpleName(),
 						engine.getCurrentCycle()));
+	}
+
+	@Override
+	public void onBuildingCollapsed(ResidentialBuilding building) {
+		mainScreen.getLogPanel().updateData(
+				String.format("Building at %s has been collapsed in cycle %s", building.getLocation(), engine.getCurrentCycle()));
+		
 	}
 
 }

@@ -349,6 +349,8 @@ public class Simulator implements WorldListener  {
 		this.logListener = logListener;
 		for(Citizen citizen :  citizens)
 			citizen.setLogListener(logListener);
+		for(ResidentialBuilding building : buildings)
+			building.setLogListener(logListener);
 		for(Disaster disaster : plannedDisasters)
 			disaster.setListener(logListener);
 	}

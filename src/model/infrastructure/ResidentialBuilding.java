@@ -2,6 +2,7 @@ package model.infrastructure;
 
 import java.util.ArrayList;
 
+import controller.LogListener;
 import model.disasters.Disaster;
 import model.events.SOSListener;
 import model.people.Citizen;
@@ -20,11 +21,22 @@ public class ResidentialBuilding implements Rescuable, Simulatable
 	private ArrayList<Citizen> occupants;
 	private Disaster disaster;
 	private SOSListener emergencyService;
+	private LogListener logListener;
+	private boolean isFrstTime = true;
 	public ResidentialBuilding(Address location) {
 		this.location = location;
 		this.structuralIntegrity=100;
 		occupants= new ArrayList<Citizen>();
 	}
+	
+	public void setLogListener(LogListener logListener) {
+		this.logListener = logListener;
+	}
+
+	public LogListener getLogListener() {
+		return logListener;
+	}
+
 	public int getStructuralIntegrity() {
 		return structuralIntegrity;
 	}
@@ -32,6 +44,11 @@ public class ResidentialBuilding implements Rescuable, Simulatable
 		this.structuralIntegrity = structuralIntegrity;
 		if(structuralIntegrity<=0)
 		{
+			if(logListener != null && isFrstTime)
+			{
+				logListener.onBuildingCollapsed(this);
+				isFrstTime = false;
+			}
 			this.structuralIntegrity=0;
 			for(int i = 0 ; i< occupants.size(); i++)
 				occupants.get(i).setHp(0);
