@@ -69,6 +69,12 @@ public class Simulator implements WorldListener  {
 		}
 	}
 	
+	
+	public ArrayList<Citizen> getCitizens() {
+		return citizens;
+	}
+
+
 	private void loadUnits(String path) throws Exception {
 		BufferedReader br = new BufferedReader(new FileReader(path));
 		String line = br.readLine();

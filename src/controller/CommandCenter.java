@@ -279,6 +279,7 @@ public class CommandCenter implements SOSListener, GUIListener, LogListener {
 		selectedUnit = null;
 	}
 
+	
 	public void printCell(int x, int y) {
 		String citizens = "";
 		String buildings = "";
@@ -290,7 +291,7 @@ public class CommandCenter implements SOSListener, GUIListener, LogListener {
 		if (buildings != "")
 			buildings = "Buildings:\n" + buildings;
 
-		for (Citizen citizen : visibleCitizens)
+		for (Citizen citizen : engine.getCitizens())
 			if (citizen.getLocation().getX() == x && citizen.getLocation().getY() == y)
 				citizens += applySpacesToString(citizen.toString());
 		if (citizens != "")
