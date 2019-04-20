@@ -65,7 +65,8 @@ public abstract class PoliceUnit extends Unit {
 
 	@Override
 	public String toString() {
-		return String.format("%s\nDisatance to base: %s\nMax Capacity: %s", super.toString(),getDistanceToBase(),getMaxCapacity());
+		return String.format("%s\nDisatance to base: %s\nMax Capacity: %s\nPassengers: %s\n%s",
+				super.toString(),getDistanceToBase(),getMaxCapacity(),getPassengers().size(),getPassengers());
 	}
 
 }
