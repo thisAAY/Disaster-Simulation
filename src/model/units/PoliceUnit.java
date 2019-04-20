@@ -39,7 +39,7 @@ public abstract class PoliceUnit extends Unit {
 				getWorldListener().assignAddress(this, 0, 0);
 		} else {
 			if (passengers.size() != 0) {
-
+				
 				for (int i = 0; i < passengers.size(); i++) {
 					Citizen c = passengers.get(i);
 					if (c.getState() != CitizenState.DECEASED)

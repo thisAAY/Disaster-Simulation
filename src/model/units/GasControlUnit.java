@@ -46,7 +46,7 @@ public class GasControlUnit extends FireUnit {
 			throw a;
 		}else if(this.canTreat(r)==false||((ResidentialBuilding)r).getDisaster() instanceof Collapse||((ResidentialBuilding)r).getDisaster() instanceof Fire) {
 			ResidentialBuilding target=(ResidentialBuilding)r;
-			CannotTreatException a = new CannotTreatException(this, target, " You can't treat this citizen");
+			CannotTreatException a = new CannotTreatException(this, target, " You can't treat this building");
 			throw a;
 		}else {
 			ResidentialBuilding target=(ResidentialBuilding)r;
