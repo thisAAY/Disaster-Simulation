@@ -4,9 +4,12 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Array;
+import java.net.Socket;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
@@ -43,11 +46,13 @@ import simulation.Address;
 import simulation.Rescuable;
 import simulation.Simulator;
 import view.CitizensFrame;
+import view.ClientView;
 import view.ESCButtonListener;
 import view.GUIHelper;
 import view.MainScreen;
+import view.ServerView;
 
-public class CommandCenter implements SOSListener, GUIListener, LogListener {
+public class CommandCenter implements SOSListener, GUIListener, LogListener, MessagesListener, ConnectionListener {
 
 	private Simulator engine;
 	private ArrayList<ResidentialBuilding> visibleBuildings;
@@ -56,7 +61,10 @@ public class CommandCenter implements SOSListener, GUIListener, LogListener {
 	private Unit selectedUnit;
 	private Address selectedLocation;
 	private MainScreen mainScreen;
-
+	private Server server;
+	private Client client;
+	private ServerView serverView;
+	private ClientView clientView;
 	public CommandCenter() throws Exception {
 		engine = new Simulator(this);
 		engine.setLogListener(this);
@@ -64,9 +72,17 @@ public class CommandCenter implements SOSListener, GUIListener, LogListener {
 		visibleCitizens = new ArrayList<Citizen>();
 		emergencyUnits = engine.getEmergencyUnits();
 		mainScreen = new MainScreen(this);
-
 		buildCity();
 		buildUnits();
+		
+		server = new Server(this,this,16200); // Sorry for this stupid port
+		server.start();
+		
+		Thread.sleep(3000);
+		client =  new Client(this, "192.168.1.5", 16200);
+		client.start();
+		clientView = new ClientView(this, "ok");
+		
 
 	}
 
@@ -377,5 +393,30 @@ public class CommandCenter implements SOSListener, GUIListener, LogListener {
 				String.format("Building at %s has been collapsed in cycle %s", building.getLocation(), engine.getCurrentCycle()));
 		
 	}
+
+	@Override
+	public void onMessageRecived(String msg, boolean isFromClient) {
+		if(!isFromClient)
+			serverView.addMessage("Client: " + msg);
+		else
+			clientView.addMessage("Server: " + msg);
+	}
+
+	@Override
+	public void onDeviceConnected(Server server) {
+		serverView = new ServerView(this, server.getSocket().getInetAddress().getHostName());
+		
+	}
+
+	@Override
+	public void onSendMessageClicked(String message, Boolean isFromClient) {
+		System.out.println("Message want to be sent " + message);
+		if(isFromClient)
+			client.writeLine(message);
+		else
+			server.writeLine(message);
+	}
+
+	
 
 }

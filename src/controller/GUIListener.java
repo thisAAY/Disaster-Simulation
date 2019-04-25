@@ -9,4 +9,5 @@ public interface GUIListener {
 	void onUnitSelected(JButton btn);
 	void onUnSelectUnit();
 	void onCellSelected(JButton btn);
+	void onSendMessageClicked(String message,Boolean isFromClient);
 }
