@@ -27,7 +27,7 @@ public class Client extends Connection{
 	@Override
 	public void run() {
 		try {
-			Socket socket = new Socket(ip, port);
+			socket = new Socket(ip, port);
 			reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
 			startReading();

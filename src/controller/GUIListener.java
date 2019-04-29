@@ -10,4 +10,5 @@ public interface GUIListener {
 	void onUnSelectUnit();
 	void onCellSelected(JButton btn);
 	void onSendMessageClicked(String message,Boolean isFromClient);
+	void onAskForHelp();
 }

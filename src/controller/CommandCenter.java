@@ -11,6 +11,8 @@ import java.io.PrintWriter;
 import java.lang.reflect.Array;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -65,6 +67,7 @@ public class CommandCenter implements SOSListener, GUIListener, LogListener, Mes
 	private Client client;
 	private ServerView serverView;
 	private ClientView clientView;
+
 	public CommandCenter() throws Exception {
 		engine = new Simulator(this);
 		engine.setLogListener(this);
@@ -74,15 +77,9 @@ public class CommandCenter implements SOSListener, GUIListener, LogListener, Mes
 		mainScreen = new MainScreen(this);
 		buildCity();
 		buildUnits();
-		
-		server = new Server(this,this,16200); // Sorry for this stupid port
+
+		server = new Server(this, this, 16200); // Sorry for this stupid port
 		server.start();
-		
-		Thread.sleep(3000);
-		client =  new Client(this, "192.168.1.5", 16200);
-		client.start();
-		clientView = new ClientView(this, "ok");
-		
 
 	}
 
@@ -295,7 +292,6 @@ public class CommandCenter implements SOSListener, GUIListener, LogListener, Mes
 		selectedUnit = null;
 	}
 
-	
 	public void printCell(int x, int y) {
 		String citizens = "";
 		String buildings = "";
@@ -364,19 +360,20 @@ public class CommandCenter implements SOSListener, GUIListener, LogListener, Mes
 			}
 		}
 	}
-	public void askToTargetOccupents(ResidentialBuilding building)
-	{
-		 int reply = JOptionPane.showConfirmDialog(null, "Incompatabile target, Do u want to target it's occupents?", "Target occupents", JOptionPane.YES_NO_OPTION);
-	        if (reply == JOptionPane.YES_OPTION) {
-		          new CitizensFrame(this, building.getOccupants());
-	        }
+
+	public void askToTargetOccupents(ResidentialBuilding building) {
+		int reply = JOptionPane.showConfirmDialog(null, "Incompatabile target, Do u want to target it's occupents?",
+				"Target occupents", JOptionPane.YES_NO_OPTION);
+		if (reply == JOptionPane.YES_OPTION) {
+			new CitizensFrame(this, building.getOccupants());
+		}
 	}
 
 	@Override
 	public void onCitizenDie(Citizen citizen) {
 
-		mainScreen.getLogPanel().updateData(
-				String.format("Citizen: %s has died in location %s and  in cycle %s", citizen.getName(),citizen.getLocation(), engine.getCurrentCycle()));
+		mainScreen.getLogPanel().updateData(String.format("Citizen: %s has died in location %s and  in cycle %s",
+				citizen.getName(), citizen.getLocation(), engine.getCurrentCycle()));
 	}
 
 	@Override
@@ -389,14 +386,14 @@ public class CommandCenter implements SOSListener, GUIListener, LogListener, Mes
 
 	@Override
 	public void onBuildingCollapsed(ResidentialBuilding building) {
-		mainScreen.getLogPanel().updateData(
-				String.format("Building at %s has been collapsed in cycle %s", building.getLocation(), engine.getCurrentCycle()));
-		
+		mainScreen.getLogPanel().updateData(String.format("Building at %s has been collapsed in cycle %s",
+				building.getLocation(), engine.getCurrentCycle()));
+
 	}
 
 	@Override
 	public void onMessageRecived(String msg, boolean isFromClient) {
-		if(!isFromClient)
+		if (!isFromClient)
 			serverView.addMessage("Client: " + msg);
 		else
 			clientView.addMessage("Server: " + msg);
@@ -405,18 +402,39 @@ public class CommandCenter implements SOSListener, GUIListener, LogListener, Mes
 	@Override
 	public void onDeviceConnected(Server server) {
 		serverView = new ServerView(this, server.getSocket().getInetAddress().getHostName());
-		
+
 	}
 
 	@Override
 	public void onSendMessageClicked(String message, Boolean isFromClient) {
 		System.out.println("Message want to be sent " + message);
-		if(isFromClient)
+		if (isFromClient)
 			client.writeLine(message);
 		else
 			server.writeLine(message);
 	}
 
-	
+	@Override
+	public void onAskForHelp() {
+		String ip = JOptionPane.showInputDialog(null, "Enter Friend ip");
+		if (ip != null && !ip.equals("")) {
+			client = new Client(this, ip, 16200);
+			client.start();
+			Timer timer = new Timer();
+			timer.scheduleAtFixedRate(new TimerTask() {
+				
+				@Override
+				public void run() {
+					System.out.println("hii");
+					if(client.getSocket() != null)
+					{
+						clientView = new ClientView(CommandCenter.this, client.getSocket().getInetAddress().getHostName());		
+						timer.cancel();
+					}
+				}
+			}, 100, 100);
+		}
+
+	}
 
 }
