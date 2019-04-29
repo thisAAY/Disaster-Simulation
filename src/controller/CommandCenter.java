@@ -67,7 +67,8 @@ public class CommandCenter implements SOSListener, GUIListener, LogListener, Mes
 	private Client client;
 	private ServerView serverView;
 	private ClientView clientView;
-
+	private boolean isLog;
+	private String friendLogData;
 	public CommandCenter() throws Exception {
 		engine = new Simulator(this);
 		engine.setLogListener(this);
@@ -372,34 +373,84 @@ public class CommandCenter implements SOSListener, GUIListener, LogListener, Mes
 	@Override
 	public void onCitizenDie(Citizen citizen) {
 
-		mainScreen.getLogPanel().updateData(String.format("Citizen: %s has died in location %s and  in cycle %s",
-				citizen.getName(), citizen.getLocation(), engine.getCurrentCycle()));
+		String data = String.format("Citizen: %s has died in location %s and  in cycle %s",
+				citizen.getName(), citizen.getLocation(), engine.getCurrentCycle());
+		mainScreen.getLogPanel().updateData(data);
+		updatePlayerViewData(data);
+		sendDataToFriend(data);
+
 	}
 
 	@Override
 	public void onDiasterStrick(Disaster disaster) {
+		String data = String.format("A new %s diaster has striked a %s in cycle %s",
+				disaster.getClass().getSimpleName(), disaster.getTarget().getClass().getSimpleName(),
+				engine.getCurrentCycle());
 		mainScreen.getLogPanel()
-				.updateData(String.format("A new %s diaster has striked a %s in cycle %s",
-						disaster.getClass().getSimpleName(), disaster.getTarget().getClass().getSimpleName(),
-						engine.getCurrentCycle()));
+				.updateData(data);
+		updatePlayerViewData(data);
+		sendDataToFriend(data);
+
 	}
 
 	@Override
 	public void onBuildingCollapsed(ResidentialBuilding building) {
-		mainScreen.getLogPanel().updateData(String.format("Building at %s has been collapsed in cycle %s",
-				building.getLocation(), engine.getCurrentCycle()));
+		String data = String.format("Building at %s has been collapsed in cycle %s",
+				building.getLocation(), engine.getCurrentCycle());
+		mainScreen.getLogPanel().updateData(data);
+		updatePlayerViewData(data);
+		sendDataToFriend(data);
 
+	}
+	public void updatePlayerViewData(String data)
+	{
+		if(serverView != null && serverView.isVisible())
+		{
+			serverView.updateLog(data);
+		}
+	}
+	public void updateFriendViewData(String data)
+	{
+		if(clientView != null && clientView.isVisible())
+		{
+			clientView.updateLog(data);
+		}
+	}
+	public void sendDataToFriend(String data)
+	{
+		if(server != null && server.isAlive())
+			server.writeLine("START_LOG" + data + "\nEND_LOG");
 	}
 
 	@Override
 	public void onMessageRecived(String msg, boolean isFromClient) {
-		if (!isFromClient)
+		if(msg.startsWith("START_LOG") && !isLog)
+		{
+			isLog = true;
+			friendLogData = msg.replace("START_LOG", "");
+			return;
+		}
+		if(isLog)
+		{
+
+			if(msg.equals("END_LOG"))
+			{
+				isLog = false;
+				updateFriendViewData(friendLogData);
+				friendLogData =null;
+			}
+			else
+				friendLogData += msg ;
+			return;
+		}
+		msg = msg.trim();
+		if (!isFromClient && !msg.equals("") )
 		{
 			serverView.addMessage("Player: " + msg,GUIHelper.CLIENT);
 		}
 		else
 		{
-			clientView.addMessage("Firend: " + msg,GUIHelper.SERVER);
+			clientView.addMessage("Friend: " + msg,GUIHelper.SERVER);
 		}
 	}
 

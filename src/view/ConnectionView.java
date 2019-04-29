@@ -36,14 +36,22 @@ public abstract class ConnectionView extends JFrame implements ActionListener {
 	private JTextArea msgField;
 	private boolean isFromClient;
 	private GUIListener guiListener; 
+	private LogPanel logPanel;
 	public ConnectionView(GUIListener guiListener,String titile,boolean isFromClient)
 	{
 		this.isFromClient =isFromClient;
 		this.guiListener = guiListener;
 		setTitle(String.format("Connected to %s", titile));
-		setSize(300,600);
-		setResizable(false);
+		setSize(800,600);
 		setLayout(new BorderLayout());
+		JPanel chatPanel = new JPanel();
+		chatPanel.setSize(300,getHeight());
+		chatPanel.setMaximumSize(new Dimension(300,getHeight()));
+		chatPanel.setPreferredSize(new Dimension(300,getHeight()));
+
+		chatPanel.setLayout(new BorderLayout());
+		setResizable(false);
+		chatPanel.setLayout(new BorderLayout());
 		JPanel sendingPanel = new JPanel();
 		sendingPanel.setLayout(new FlowLayout());
 		msgField = new JTextArea();
@@ -52,7 +60,7 @@ public abstract class ConnectionView extends JFrame implements ActionListener {
 		msgField.setPreferredSize(new Dimension(200,nextBtn.getPreferredSize().height));
 		nextBtn.addActionListener(this);
 		sendingPanel.add(nextBtn);
-		add(sendingPanel,BorderLayout.SOUTH);
+		chatPanel.add(sendingPanel,BorderLayout.SOUTH);
 		messagesPanel = new JTextPane();
 		messagesPanel.setLayout(new BoxLayout(messagesPanel, BoxLayout.Y_AXIS));
 		getContentPane().setBackground(GUIHelper.SIMI_BLACK);
@@ -65,7 +73,16 @@ public abstract class ConnectionView extends JFrame implements ActionListener {
 		
 		JScrollPane scrollPane = new JScrollPane(messagesPanel);
 		
-		add(scrollPane);
+		chatPanel.add(scrollPane);
+		chatPanel.setBackground(GUIHelper.SIMI_BLACK);
+		add(chatPanel,BorderLayout.EAST);
+		
+		
+		logPanel =  new LogPanel();
+		logPanel.setMaximumSize(new Dimension(480,getHeight()));
+		logPanel.setPreferredSize(new Dimension(480,getHeight()));
+		
+		add(logPanel,BorderLayout.WEST);
 		setAlwaysOnTop(true);
 		setVisible(true);
 	}
@@ -101,8 +118,14 @@ public abstract class ConnectionView extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		
-		guiListener.onSendMessageClicked(msgField.getText(), isFromClient);
+		if(msgField.getText().trim().equals(""))
+			return;
+		guiListener.onSendMessageClicked(msgField.getText().trim(), isFromClient);
 		msgField.setText("");
+	}
+	public void updateLog(String data)
+	{
+		logPanel.updateData(data);
 	}
 	public abstract Color getColor();
 	
