@@ -376,7 +376,7 @@ public class CommandCenter implements SOSListener, GUIListener, LogListener, Mes
 		String data = String.format("Citizen: %s has died in location %s and  in cycle %s",
 				citizen.getName(), citizen.getLocation(), engine.getCurrentCycle());
 		mainScreen.getLogPanel().updateData(data);
-		updatePlayerViewData(data);
+		updateFriendViewData(data);
 		sendDataToFriend(data);
 
 	}
@@ -388,7 +388,7 @@ public class CommandCenter implements SOSListener, GUIListener, LogListener, Mes
 				engine.getCurrentCycle());
 		mainScreen.getLogPanel()
 				.updateData(data);
-		updatePlayerViewData(data);
+		updateFriendViewData(data);
 		sendDataToFriend(data);
 
 	}
@@ -398,7 +398,7 @@ public class CommandCenter implements SOSListener, GUIListener, LogListener, Mes
 		String data = String.format("Building at %s has been collapsed in cycle %s",
 				building.getLocation(), engine.getCurrentCycle());
 		mainScreen.getLogPanel().updateData(data);
-		updatePlayerViewData(data);
+		updateFriendViewData(data);
 		sendDataToFriend(data);
 
 	}
@@ -418,8 +418,8 @@ public class CommandCenter implements SOSListener, GUIListener, LogListener, Mes
 	}
 	public void sendDataToFriend(String data)
 	{
-		if(server != null && server.isAlive())
-			server.writeLine("START_LOG" + data + "\nEND_LOG");
+		if(client != null && client.isAlive())
+			client.writeLine("START_LOG" + data + "\nEND_LOG");
 	}
 
 	@Override
@@ -436,7 +436,7 @@ public class CommandCenter implements SOSListener, GUIListener, LogListener, Mes
 			if(msg.equals("END_LOG"))
 			{
 				isLog = false;
-				updateFriendViewData(friendLogData);
+				updatePlayerViewData(friendLogData);
 				friendLogData =null;
 			}
 			else
