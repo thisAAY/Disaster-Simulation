@@ -418,8 +418,9 @@ public class CommandCenter implements SOSListener, GUIListener, LogListener, Mes
 	}
 	public void sendDataToFriend(String data)
 	{
-		if(client != null && client.isAlive())
+		
 			client.writeLine("START_LOG" + data + "\nEND_LOG");
+		
 	}
 
 	@Override
