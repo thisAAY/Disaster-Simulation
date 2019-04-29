@@ -395,11 +395,11 @@ public class CommandCenter implements SOSListener, GUIListener, LogListener, Mes
 	public void onMessageRecived(String msg, boolean isFromClient) {
 		if (!isFromClient)
 		{
-			serverView.addMessage("Firend: " + msg,GUIHelper.CLIENT);
+			serverView.addMessage("Player: " + msg,GUIHelper.CLIENT);
 		}
 		else
 		{
-			clientView.addMessage("Player: " + msg,GUIHelper.SERVER);
+			clientView.addMessage("Firend: " + msg,GUIHelper.SERVER);
 		}
 	}
 
@@ -414,14 +414,14 @@ public class CommandCenter implements SOSListener, GUIListener, LogListener, Mes
 		if (isFromClient)
 		{
 			client.writeLine(message);
-			clientView.addMessage("You: " + message,GUIHelper.SERVER);
+			clientView.addMessage("You: " + message,GUIHelper.CLIENT);
 
 
 		}
 		else
 		{
 			server.writeLine(message);
-			serverView.addMessage("You: " + message,GUIHelper.CLIENT);
+			serverView.addMessage("You: " + message,GUIHelper.SERVER);
 
 		}
 	}

@@ -1,3 +1,7 @@
+/ambulance.png
+/bloodloss.png
+/close-circle.png
+/coll.png
 /controller/
 /diseaseUnit.png
 /exceptions/
@@ -10,5 +14,5 @@
 /simulation/
 /tests/
 /train.png
-/view/
 /user.png
+/view/
