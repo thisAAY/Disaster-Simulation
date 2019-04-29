@@ -394,9 +394,13 @@ public class CommandCenter implements SOSListener, GUIListener, LogListener, Mes
 	@Override
 	public void onMessageRecived(String msg, boolean isFromClient) {
 		if (!isFromClient)
-			serverView.addMessage("Client: " + msg);
+		{
+			serverView.addMessage("Firend: " + msg,GUIHelper.CLIENT);
+		}
 		else
-			clientView.addMessage("Server: " + msg);
+		{
+			clientView.addMessage("Player: " + msg,GUIHelper.SERVER);
+		}
 	}
 
 	@Override
@@ -407,11 +411,19 @@ public class CommandCenter implements SOSListener, GUIListener, LogListener, Mes
 
 	@Override
 	public void onSendMessageClicked(String message, Boolean isFromClient) {
-		System.out.println("Message want to be sent " + message);
 		if (isFromClient)
+		{
 			client.writeLine(message);
+			clientView.addMessage("You: " + message,GUIHelper.SERVER);
+
+
+		}
 		else
+		{
 			server.writeLine(message);
+			serverView.addMessage("You: " + message,GUIHelper.CLIENT);
+
+		}
 	}
 
 	@Override
@@ -425,7 +437,6 @@ public class CommandCenter implements SOSListener, GUIListener, LogListener, Mes
 				
 				@Override
 				public void run() {
-					System.out.println("hii");
 					if(client.getSocket() != null)
 					{
 						clientView = new ClientView(CommandCenter.this, client.getSocket().getInetAddress().getHostName());		

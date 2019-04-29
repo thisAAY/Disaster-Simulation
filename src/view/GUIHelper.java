@@ -26,6 +26,9 @@ public class GUIHelper {
 	public static Color DECEASED_CITIZEN = new Color(15,17,12);
 	public static Color TREATING = new Color(68,157,209);
 	public static Color RESPONDING = new Color(68,161,160);
+	public static Color SERVER = new Color(244,241,187);
+	public static Color CLIENT = new Color(237,106,90);
+
 	public static JButton makeImageButton(String path) {
 		try {	
 			BufferedImage buttonIcon = ImageIO.read(new File(path));

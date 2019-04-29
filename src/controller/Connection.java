@@ -20,7 +20,6 @@ public abstract class Connection extends Thread{
 	{
 		if(writer != null)
 		{
-			System.out.println("writing " + line + " ...");
 			writer.println(line);
 			writer.flush();
 		}
@@ -31,19 +30,16 @@ public abstract class Connection extends Thread{
 			
 			@Override
 			public void run() {
-				System.out.println(socket);
 				if(reader !=  null)
 				{
 					String line = null;
 					try {
 						while( (line = reader.readLine()) != null)
 						{
-							System.out.println("reading " + line + " ...");
 							messagesListener.onMessageRecived(line, isFromClient);
 						}
 					} catch (IOException e) {
-						System.out.println(Connection.this.getClass().getSimpleName());
-						e.printStackTrace();
+						
 					}
 				}
 			}

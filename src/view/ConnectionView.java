@@ -5,24 +5,34 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.awt.Label;
 import java.awt.TextArea;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
+import javax.swing.border.Border;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 
 import controller.GUIListener;
 
 public abstract class ConnectionView extends JFrame implements ActionListener {
-	private JPanel messagesPanel; 
+	private JTextPane messagesPanel; 
 	private JTextArea msgField;
 	private boolean isFromClient;
 	private GUIListener guiListener; 
@@ -43,17 +53,50 @@ public abstract class ConnectionView extends JFrame implements ActionListener {
 		nextBtn.addActionListener(this);
 		sendingPanel.add(nextBtn);
 		add(sendingPanel,BorderLayout.SOUTH);
-		messagesPanel = new JPanel();
+		messagesPanel = new JTextPane();
 		messagesPanel.setLayout(new BoxLayout(messagesPanel, BoxLayout.Y_AXIS));
-		add(messagesPanel);
+		getContentPane().setBackground(GUIHelper.SIMI_BLACK);
+		messagesPanel.setBackground(GUIHelper.SIMI_BLACK);
+		sendingPanel.setBackground(GUIHelper.SIMI_BLACK);
+		sendingPanel.setBorder(BorderFactory.createLineBorder(GUIHelper.SIMI_WHITE));
+		messagesPanel.setBorder(BorderFactory.createEmptyBorder(4,4,4,4));
+		messagesPanel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
+		
+		
+		JScrollPane scrollPane = new JScrollPane(messagesPanel);
+		
+		add(scrollPane);
+		setAlwaysOnTop(true);
 		setVisible(true);
 	}
-	public void addMessage(String message)
+	public void addMessage(String message,Color c)
 	{
-		JLabel msgLbl  = new JLabel();
-		msgLbl.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
-		messagesPanel.add(new JLabel(message));
+		appendToPane(messagesPanel, message + "\n", c);
+		
 		revalidate();
+	}
+	private void appendToPane(JTextPane tp, String msg, Color c)
+    {
+        StyleContext sc = StyleContext.getDefaultStyleContext();
+        AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, c);
+
+        aset = sc.addAttribute(aset, StyleConstants.FontFamily, "Lucida Console");
+        aset = sc.addAttribute(aset, StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
+
+        int len = tp.getDocument().getLength();
+        tp.setCaretPosition(len);
+        tp.setCharacterAttributes(aset, false);
+        tp.replaceSelection(msg);
+    }
+	public void applySize(JTextArea text)
+	{
+		Graphics g = getGraphics();
+		FontMetrics metrics = g.getFontMetrics(text.getFont());
+		int hgt = metrics.getHeight();
+		int adv = metrics.stringWidth(text.getText());
+		Dimension size = new Dimension(adv+2, hgt+2);
+		text.setMaximumSize(size);
+		System.out.println(text.getText());
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -61,5 +104,6 @@ public abstract class ConnectionView extends JFrame implements ActionListener {
 		guiListener.onSendMessageClicked(msgField.getText(), isFromClient);
 		msgField.setText("");
 	}
+	public abstract Color getColor();
 	
 }
